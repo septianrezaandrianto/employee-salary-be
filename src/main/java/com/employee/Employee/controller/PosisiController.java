@@ -41,7 +41,7 @@ public class PosisiController {
    }
 		 
 	 //Get All User
-	 @GetMapping("/Posisi/readAll")
+	 @GetMapping("/Posisi/all")
 	 public HashMap<String, Object> getAllUser() {
 		HashMap<String, Object> showHashMap = new HashMap<String, Object>();
 		List<PosisiDTO> listPosisi = new ArrayList<PosisiDTO>();

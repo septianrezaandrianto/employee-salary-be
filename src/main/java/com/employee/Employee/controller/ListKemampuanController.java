@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.employee.Employee.dto.KaryawanDTO;
+import com.employee.Employee.dto.KemampuanDTO;
 import com.employee.Employee.dto.ListKemampuanDTO;
 import com.employee.Employee.model.ListKemampuan;
 import com.employee.Employee.repository.ListKemampuanRepository;
@@ -41,7 +43,7 @@ public class ListKemampuanController {
    }
 		 
 	 //Get All User
-	 @GetMapping("/ListKemampuan/readAll")
+	 @GetMapping("/ListKemampuan/all")
 	 public HashMap<String, Object> getAllUser() {
 		HashMap<String, Object> showHashMap = new HashMap<String, Object>();
 		List<ListKemampuanDTO> listListKemampuan = new ArrayList<ListKemampuanDTO>();
@@ -107,10 +109,12 @@ public class ListKemampuanController {
 	
 	listKemampuanDto.setIdListKemampuan(tempListKemampuan.getIdListKemampuan());
     if (listKemampuanDto.getKemampuan() == null) {
-    	listKemampuanDto.setKemampuan(tempListKemampuan.getKemampuan());
+    	KemampuanDTO kemampuan = modelMapper.map(tempListKemampuan.getKemampuan(), KemampuanDTO.class);
+    	listKemampuanDto.setKemampuan(kemampuan);
     }
     if (listKemampuanDto.getKaryawan() == null) {
-    	listKemampuanDto.setKaryawan(tempListKemampuan.getKaryawan());
+    	KaryawanDTO karyawan = modelMapper.map(tempListKemampuan.getKaryawan(), KaryawanDTO.class);
+    	listKemampuanDto.setKaryawan(karyawan);
     }
     if (listKemampuanDto.getNilaiKemampuan() == null) {
     	listKemampuanDto.setNilaiKemampuan(tempListKemampuan.getNilaiKemampuan());
