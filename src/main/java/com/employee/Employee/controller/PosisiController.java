@@ -65,7 +65,7 @@ public class PosisiController {
 	 
 	 // Read User By ID
 	 @GetMapping("/Posisi/{id}")
-	 public HashMap<String, Object> getById(@PathVariable(value = "id") Integer id){
+	 public HashMap<String, Object> getById(@PathVariable(value = "id") int id){
 		HashMap<String, Object> showHashMap = new HashMap<String, Object>();
 		Posisi posisi = posisiRepository.findById(id).orElse(null);
 		PosisiDTO posisiDTO = convertToDTO(posisi);
@@ -101,7 +101,7 @@ public class PosisiController {
 	
 	// Update a User
    @PutMapping("/Posisi/update/{id}")
-   public HashMap<String, Object> update(@PathVariable(value = "id") Integer id, @Valid @RequestBody PosisiDTO posisiDto) {
+   public HashMap<String, Object> update(@PathVariable(value = "id") int id, @Valid @RequestBody PosisiDTO posisiDto) {
 	HashMap<String, Object> process = new HashMap<String, Object>();
 	Posisi tempPosisi = posisiRepository.findById(id).orElse(null);      
 	
@@ -120,7 +120,7 @@ public class PosisiController {
    
    // Delete a User
    @DeleteMapping("/Posisi/delete/{id}")
-   public HashMap<String, Object> delete(@PathVariable(value = "id") Integer id) {
+   public HashMap<String, Object> delete(@PathVariable(value = "id") int id) {
    	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
    	Posisi posisi = posisiRepository.findById(id).orElse(null);
 
