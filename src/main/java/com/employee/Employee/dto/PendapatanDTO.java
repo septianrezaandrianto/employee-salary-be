@@ -8,7 +8,7 @@ import com.employee.Employee.model.Karyawan;
 public class PendapatanDTO {
 
 	private int idPendapatan;
-	private Karyawan karyawan;
+	private KaryawanDTO karyawanDto;
 	private Date tanggalGaji;
 	private BigDecimal gajiPokok;
 	private BigDecimal tunjanganKeluarga;
@@ -30,13 +30,13 @@ public class PendapatanDTO {
 	}
 
 
-	public PendapatanDTO(int idPendapatan, Karyawan karyawan, Date tanggalGaji, BigDecimal gajiPokok,
+	public PendapatanDTO(int idPendapatan, KaryawanDTO karyawanDto, Date tanggalGaji, BigDecimal gajiPokok,
 			BigDecimal tunjanganKeluarga, BigDecimal tunjanganPegawai, BigDecimal tunjanganTransport,
 			BigDecimal gajiKotor, BigDecimal pphPerbulan, BigDecimal bpjs, BigDecimal gajiBersih, Integer lamaLembur,
 			BigDecimal uangLembur, Integer variableBonus, BigDecimal uangBonus, BigDecimal takeHomePay) {
 		super();
 		this.idPendapatan = idPendapatan;
-		this.karyawan = karyawan;
+		this.karyawanDto = karyawanDto;
 		this.tanggalGaji = tanggalGaji;
 		this.gajiPokok = gajiPokok;
 		this.tunjanganKeluarga = tunjanganKeluarga;
@@ -64,13 +64,13 @@ public class PendapatanDTO {
 	}
 
 
-	public Karyawan getKaryawan() {
-		return karyawan;
+	public KaryawanDTO getKaryawanDto() {
+		return karyawanDto;
 	}
 
 
-	public void setKaryawan(Karyawan karyawan) {
-		this.karyawan = karyawan;
+	public void setKaryawanDto(KaryawanDTO karyawan) {
+		this.karyawanDto = karyawan;
 	}
 
 
