@@ -3,9 +3,13 @@ package com.employee.Employee.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -78,7 +82,8 @@ public class ParameterPajak implements java.io.Serializable {
 	}
 
 	@Id
-
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_parameter_pajak_id_param_pajak_seq")
+	@SequenceGenerator(name="generator_parameter_pajak_id_param_pajak_seq", sequenceName="parameter_pajak_id_param_pajak_seq", schema = "public", allocationSize = 1)
 	@Column(name = "id_param_pajak", unique = true, nullable = false)
 	public int getIdParamPajak() {
 		return this.idParamPajak;
