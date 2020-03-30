@@ -82,8 +82,8 @@ public class ParameterPajak implements java.io.Serializable {
 	}
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_parameter_pajak_id_parameter_pajak_seq")
-	@SequenceGenerator(name="generator_parameter_pajak_id_parameter_pajak_seq", sequenceName="parameter_pajak_id_parameter_pajak_seq", schema = "public", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_parameter_pajak_id_param_pajak_seq")
+	@SequenceGenerator(name="generator_parameter_pajak_id_param_pajak_seq", sequenceName="parameter_pajak_id_param_pajak_seq", schema = "public", allocationSize = 1)
 	@Column(name = "id_param_pajak", unique = true, nullable = false)
 	public int getIdParamPajak() {
 		return this.idParamPajak;
