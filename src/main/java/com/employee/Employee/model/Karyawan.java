@@ -25,7 +25,6 @@ import javax.persistence.TemporalType;
 @Table(name = "karyawan", schema = "public")
 public class Karyawan implements java.io.Serializable {
 	
-	private static final long serialVersionUID = 1L;
 	private int idKaryawan;
 	private Posisi posisi;
 	private Penempatan penempatan;

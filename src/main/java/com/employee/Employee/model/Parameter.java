@@ -67,8 +67,8 @@ public class Parameter implements java.io.Serializable {
 	}
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_parameter_id_parameter_seq")
-	@SequenceGenerator(name="generator_parameter_id_parameter_seq", sequenceName="parameter_id_parameter_seq", schema="public", allocationSize=1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_parameter_id_param_seq")
+	@SequenceGenerator(name="generator_parameter_id_param_seq", sequenceName="parameter_id_param_seq", schema="public", allocationSize=1)
 	@Column(name = "id_param", unique = true, nullable = false)
 	public int getIdParam() {
 		return this.idParam;

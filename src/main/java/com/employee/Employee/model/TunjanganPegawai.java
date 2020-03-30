@@ -42,8 +42,8 @@ public class TunjanganPegawai implements java.io.Serializable {
 	}
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_tunjangan_id_tunjangan_pegawai_tunjangan_seq")
-	@SequenceGenerator(name ="generator_tunjangan_id_tunjangan_pegawai_tunjangan_seq", sequenceName="tunjangan_id_tunjangan_pegawai_tunjangan_seq", schema = "public", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_tunjangan_pegawai_id_tunjangan_pegawai_seq")
+	@SequenceGenerator(name ="generator_tunjangan_pegawai_id_tunjangan_pegawai_seq", sequenceName="tunjangan_pegawai_id_tunjangan_pegawai_seq", schema = "public", allocationSize = 1)
 	@Column(name = "id_tunjangan_pegawai", unique = true, nullable = false)
 	public int getIdTunjanganPegawai() {
 		return this.idTunjanganPegawai;

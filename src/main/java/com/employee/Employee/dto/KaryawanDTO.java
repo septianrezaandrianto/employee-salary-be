@@ -26,7 +26,7 @@ public class KaryawanDTO implements Serializable{
 		super();
 		// TODO Auto-generated constructor stub
 	}
-
+	
 	public KaryawanDTO(int idKaryawan, PosisiDTO posisiDto, PenempatanDTO penempatanDto, TingkatanDTO tingkatanDto,
 			AgamaDTO agamaDto, String nama, String noKtp, String alamat, Date tanggalLahir, Integer masaKerja,
 			Short statusPernikahan, Date kontrakAwal, Date kontrakAkhir, String jenisKelamin, Integer jumlahAnak) {
@@ -53,19 +53,19 @@ public class KaryawanDTO implements Serializable{
 	}
 
 	public PosisiDTO getPosisiDto() {
-		return posisiDto;
+		return this.posisiDto;
 	}
 
 	public PenempatanDTO getPenempatanDto() {
-		return penempatanDto;
+		return this.penempatanDto;
 	}
 
 	public TingkatanDTO getTingkatanDto() {
-		return tingkatanDto;
+		return this.tingkatanDto;
 	}
 
 	public AgamaDTO getAgamaDto() {
-		return agamaDto;
+		return this.agamaDto;
 	}
 
 	public String getNama() {

@@ -41,7 +41,7 @@ public class ListKemampuanController {
    }
 		 
 	 //Get All User
-	 @GetMapping("/ListKemampuan/readAll")
+	 @GetMapping("/ListKemampuan/all")
 	 public HashMap<String, Object> getAllUser() {
 		HashMap<String, Object> showHashMap = new HashMap<String, Object>();
 		List<ListKemampuanDTO> listListKemampuan = new ArrayList<ListKemampuanDTO>();

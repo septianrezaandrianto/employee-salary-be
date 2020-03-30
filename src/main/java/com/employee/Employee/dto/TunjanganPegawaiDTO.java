@@ -65,11 +65,5 @@ public class TunjanganPegawaiDTO {
 	public void setBesaranTujnaganPegawai(BigDecimal besaranTujnaganPegawai) {
 		this.besaranTujnaganPegawai = besaranTujnaganPegawai;
 	}
-
-	
-
-	
-	
-		
 	
 }
