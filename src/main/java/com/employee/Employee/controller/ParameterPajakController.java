@@ -41,7 +41,7 @@ public class ParameterPajakController {
    }
 		 
 	 //Get All User
-	 @GetMapping("/ParameterPajak/readAll")
+	 @GetMapping("/ParameterPajak/all")
 	 public HashMap<String, Object> getAllUser() {
 		HashMap<String, Object> showHashMap = new HashMap<String, Object>();
 		List<ParameterPajakDTO> listParameterPajak = new ArrayList<ParameterPajakDTO>();
