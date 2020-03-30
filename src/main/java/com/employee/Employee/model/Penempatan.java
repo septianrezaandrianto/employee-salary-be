@@ -7,8 +7,11 @@ import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 /**
@@ -40,7 +43,8 @@ public class Penempatan implements java.io.Serializable {
 	}
 
 	@Id
-
+	@SequenceGenerator(name="generator_penempatan_id_penempatan_seq", sequenceName="penempatan_id_penempatan_seq", schema = "public", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_penempatan_id_penempatan_seq")
 	@Column(name = "id_penempatan", unique = true, nullable = false)
 	public int getIdPenempatan() {
 		return this.idPenempatan;

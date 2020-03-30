@@ -5,9 +5,12 @@ import java.math.BigDecimal;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 /**
@@ -41,7 +44,8 @@ public class PresentaseGaji implements java.io.Serializable {
 	}
 
 	@Id
-
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_presentase_gaji_id_presentase_gaji_seq")
+	@SequenceGenerator(name="generator_presentase_gaji_id_presentase_gaji_seq", sequenceName = "presentase_gaji_id_presentase_gaji_seq", schema = "public", allocationSize = 1)
 	@Column(name = "id_presentase_gaji", unique = true, nullable = false)
 	public int getIdPresentaseGaji() {
 		return this.idPresentaseGaji;
