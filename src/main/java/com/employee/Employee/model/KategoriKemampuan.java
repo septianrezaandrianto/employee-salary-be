@@ -6,8 +6,11 @@ import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 /**
@@ -36,7 +39,8 @@ public class KategoriKemampuan implements java.io.Serializable {
 	}
 
 	@Id
-
+	@SequenceGenerator(name="generator_kategori_kemampuan_id_kategori_seq", sequenceName="kategori_kemampuan_id_kategori_seq", schema = "public", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_kategori_kemampuan_id_kategori_seq")
 	@Column(name = "id_kategori", unique = true, nullable = false)
 	public int getIdKategori() {
 		return this.idKategori;

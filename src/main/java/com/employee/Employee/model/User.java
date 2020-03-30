@@ -6,6 +6,9 @@ import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 /**
@@ -14,7 +17,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "user", schema = "public")
 public class User implements java.io.Serializable {
-
+	
+	private static final long serialVersionUID = 1L;
 	private UserId id;
 	private String password;
 	private Short status;
@@ -34,7 +38,8 @@ public class User implements java.io.Serializable {
 	}
 
 	@EmbeddedId
-
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_user_id_user_seq")
+	@SequenceGenerator(name="generator_user_id_user_seq", sequenceName="user_id_user_seq", schema = "public", allocationSize = 1)
 	@AttributeOverrides({ @AttributeOverride(name = "idUser", column = @Column(name = "id_user", nullable = false)),
 			@AttributeOverride(name = "username", column = @Column(name = "username", nullable = false, length = 128)) })
 	public UserId getId() {
