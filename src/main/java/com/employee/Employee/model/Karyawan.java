@@ -1,4 +1,4 @@
-package com.employee.model;
+package com.employee.Employee.model;
 // Generated Mar 30, 2020 8:42:38 AM by Hibernate Tools 4.0.1.Final
 
 import java.util.Date;
