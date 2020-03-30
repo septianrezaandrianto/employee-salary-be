@@ -13,7 +13,14 @@ public class UserDTO implements Serializable{
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
+
+	public UserDTO(UserIdDTO idDto, String password, Short status) {
+		super();
+		this.idDto = idDto;
+		this.password = password;
+		this.status = status;
+	}
+
 	public UserIdDTO getIdDto() {
 		return idDto;
 	}

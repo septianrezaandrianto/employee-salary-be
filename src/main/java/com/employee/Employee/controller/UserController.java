@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.employee.Employee.dto.UserDTO;
 import com.employee.Employee.model.User;
+import com.employee.Employee.model.UserId;
 import com.employee.Employee.repository.UserRepository;
 
 @RestController
@@ -29,7 +30,7 @@ public class UserController {
 	
 	 
 	 @Autowired
-	 UserRepository UserRepository;
+	 UserRepository userRepository;
 	 
 	 public UserDTO convertToDTO(User user) {
 		 UserDTO userDto = modelMapper.map(user, UserDTO.class);
@@ -42,13 +43,13 @@ public class UserController {
     }
 		 
 	 //Get All User
-	 @GetMapping("/User/readAll")
+	 @GetMapping("/user/all")
 	 public HashMap<String, Object> getAllUser() {
 		HashMap<String, Object> showHashMap = new HashMap<String, Object>();
 		List<UserDTO> listUsers = new ArrayList<UserDTO>();
-		for(User d : UserRepository.findAll()) {
-			UserDTO UserDTO = convertToDTO(d);
-			listUsers.add(UserDTO);
+		for(User u : userRepository.findAll()) {
+			UserDTO userDto = convertToDTO(u);
+			listUsers.add(userDto);
 		}
 		
 		String message;
@@ -65,27 +66,27 @@ public class UserController {
 	 }
 	 
 	 // Read User By ID
-	 @GetMapping("/User/{id}")
-	 public HashMap<String, Object> getById(@PathVariable(value = "id") Integer id){
+	 @GetMapping("/user/{id}")
+	 public HashMap<String, Object> getById(@PathVariable(value = "id") UserId id){
 		HashMap<String, Object> showHashMap = new HashMap<String, Object>();
-		User User = UserRepository.findById(id)
+		User user = userRepository.findById(id)
 				.orElse(null);
-		UserDTO UserDTO = convertToDTO(User);
+		UserDTO userDto = convertToDTO(user);
 		showHashMap.put("Messages", "Read Data Success");
-		showHashMap.put("Data", UserDTO);
+		showHashMap.put("Data", userDto);
 		return showHashMap;
 	}
 	 
 	// Create a new User
-	@PostMapping("/User/add")
-	public HashMap<String, Object> createUser(@Valid @RequestBody ArrayList<UserDTO> UserDTO) {
+	@PostMapping("/user/add")
+	public HashMap<String, Object> createUser(@Valid @RequestBody ArrayList<UserDTO> userDTO) {
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
-    	@Valid ArrayList<UserDTO> listUsers = UserDTO;
+    	@Valid ArrayList<UserDTO> listUsers = userDTO;
     	String message;
     	
     	for(UserDTO d : listUsers) {
-    		User User = convertToEntity(d);
-    		UserRepository.save(User);
+    		User user = convertToEntity(d);
+    		userRepository.save(user);
     	}
     
     	if(listUsers == null) {
@@ -102,62 +103,62 @@ public class UserController {
     }
 	
 	// Update a User
-//    @PutMapping("/User/update/{id}")
-//    public HashMap<String, Object> updateUser(@PathVariable(value = "id") Integer id,
-//            @Valid @RequestBody UserDTO UserDetails) {
-//    	
-//    	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
-//    	String message;
-//    	
-//    	int UserId = id.intValue();
-//    	List<User> listUsers = UserRepository.findAll();
-//    	
-//    	for(User d : listUsers) {
-//    		if(d.getDirId() == UserId) {
-//    			if(UserDetails.getDirFname() == null) {
-//    				UserDetails.setDirFname(listUsers.get(UserId).getDirFname());
+    @PutMapping("/user/update/{id}")
+    public HashMap<String, Object> updateUser(@PathVariable(value = "id") UserId id,
+            @Valid @RequestBody UserDTO userDetails) {
+    	
+    	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
+    	String message;
+    	
+    	List<User> listUsers = userRepository.findAll();
+    	
+//    	for(User u : listUsers) {
+//    		if(u.getId() == id) {
+//    			if(UserDetails.getIdDto() == null) {
+//    				UserDetails.setIdDto(listUsers.get(id.getIdUser()).getId());
 //    	    	}
-//    	    	if(UserDetails.getDirLname() == null) {
-//    	    		UserDetails.setDirLname(listUsers.get(UserId).getDirLname());
+//    	    	if(UserDetails.getPassword() == null) {
+//    	    		UserDetails.setPassword(listUsers.get(id.getIdUser()).getPassword());
 //    	    	}
 //    		}
 //    	}	
-//    	
-//    	User User = UserRepository.findById(id)
-//    			 .orElse(null);
-//
-//    	User.setDirFname(UserDetails.getDirFname());
-//    	User.setDirLname(UserDetails.getDirLname());
-//    	
-//    	User updateUser = UserRepository.save(User);
-//    	
-//    	List<User> resultList = new ArrayList<User>();
-//    	resultList.add(updateUser);
-//    	
-//    	if(resultList.isEmpty()) {
-//    		message = "Update Failed!";
-//    	} else {
-//    		message = "Update Success!";
-//    	}
-//    	
-//    	showHashMap.put("Message", message);
-//    	showHashMap.put("Total Update", resultList.size());
-//    	showHashMap.put("Data", resultList);
-//    	
-//    	return showHashMap;
-//    }
+    	
+    	User user = userRepository.findById(id)
+    			 .orElse(null);
+
+//    	user.setId(UserDetails.getIdDto());
+    	user.setPassword(userDetails.getPassword());
+    	user.setStatus(userDetails.getStatus());
+    	
+    	User updateUser = userRepository.save(user);
+    	
+    	List<User> resultList = new ArrayList<User>();
+    	resultList.add(updateUser);
+    	
+    	if(resultList.isEmpty()) {
+    		message = "Update Failed!";
+    	} else {
+    		message = "Update Success!";
+    	}
+    	
+    	showHashMap.put("Message", message);
+    	showHashMap.put("Total Update", resultList.size());
+    	showHashMap.put("Data", resultList);
+    	
+    	return showHashMap;
+    }
     
     // Delete a User
-    @DeleteMapping("/User/delete/{id}")
-    public HashMap<String, Object> delete(@PathVariable(value = "id") Integer id) {
+    @DeleteMapping("/user/delete/{id}")
+    public HashMap<String, Object> delete(@PathVariable(value = "id") UserId id) {
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
-    	User User = UserRepository.findById(id)
+    	User user = userRepository.findById(id)
     			.orElse(null);
 
-    	UserRepository.delete(User);
+    	userRepository.delete(user);
 
         showHashMap.put("Messages", "Delete Data Success!");
-        showHashMap.put("Delete data :", User);
+        showHashMap.put("Delete data :", user);
     	return showHashMap;
     }
 }
