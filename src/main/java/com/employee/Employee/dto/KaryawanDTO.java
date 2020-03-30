@@ -3,11 +3,6 @@ package com.employee.Employee.dto;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.employee.Employee.model.Agama;
-import com.employee.Employee.model.Penempatan;
-import com.employee.Employee.model.Posisi;
-import com.employee.Employee.model.Tingkatan;
-
 public class KaryawanDTO implements Serializable{
 	
 	private static final long serialVersionUID = 1L;

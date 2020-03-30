@@ -3,11 +3,15 @@ package com.employee.Employee.model;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 /**
@@ -16,7 +20,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "agama", schema = "public")
 public class Agama implements java.io.Serializable {
-
+	
+	private static final long serialVersionUID = 1L;
 	private int idAgama;
 	private String namaAgama;
 	private Set<Karyawan> karyawans = new HashSet<Karyawan>(0);
@@ -36,7 +41,8 @@ public class Agama implements java.io.Serializable {
 	}
 
 	@Id
-
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_agama_id_agama_seq")
+	@SequenceGenerator(name="generator_agama_id_agama_seq", sequenceName="agama_id_agama_seq", schema = "public", allocationSize = 1)
 	@Column(name = "id_agama", unique = true, nullable = false)
 	public int getIdAgama() {
 		return this.idAgama;
