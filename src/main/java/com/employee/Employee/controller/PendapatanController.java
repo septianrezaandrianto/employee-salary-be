@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.employee.Employee.dto.KaryawanDTO;
 import com.employee.Employee.dto.PendapatanDTO;
+import com.employee.Employee.model.Karyawan;
 import com.employee.Employee.model.Pendapatan;
 import com.employee.Employee.repository.PendapatanRepository;
 
@@ -39,6 +41,12 @@ public class PendapatanController {
 	private Pendapatan convertDTOToEntity (PendapatanDTO pendapatanDTO) {
 		Pendapatan pendapatan = modelMapper.map(pendapatanDTO, Pendapatan.class);
 	return pendapatan;
+	}
+	
+//	Convert Karyawan DTO To Entity
+	private Karyawan convertKaryawanDTOToEntity (KaryawanDTO karyawanDTO) {
+		Karyawan karyawan = modelMapper.map(karyawanDTO, Karyawan.class);
+	return karyawan;
 	}
 	
 //	Melihat seluruh Data Pendapatan
@@ -114,8 +122,8 @@ public class PendapatanController {
 		
 		pendapatanDTO.setIdPendapatan(pendapatan.getIdPendapatan());
 		
-		if (pendapatanDTO.getKaryawan() != null) {
-			pendapatan.setKaryawan(convertDTOToEntity(pendapatanDTO).getKaryawan());
+		if (pendapatanDTO.getKaryawanDto() != null) {
+			pendapatan.setKaryawan(convertKaryawanDTOToEntity(pendapatanDTO.getKaryawanDto()));
 		}
 		
 		if (pendapatanDTO.getTanggalGaji() != null) {
