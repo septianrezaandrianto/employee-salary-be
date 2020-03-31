@@ -78,28 +78,53 @@ public class KaryawanController {
 		showHashMap.put("Data", karyawanDto);
 		return showHashMap;
 	}
+	
+	// Method Validasi No KTP
+	public boolean noKtpValidation( KaryawanDTO karyawanDTO) {
+		boolean isDuplicated = false;
+		for(Karyawan k : karyawanRepository.findAll()) {
+			if(k.getNoKtp().equalsIgnoreCase(karyawanDTO.getNoKtp())) {
+				isDuplicated = true;
+			}
+		}
+		return isDuplicated;
+	}
 	 
 	// Create a new Karyawan
 	@PostMapping("/karyawan/add")
 	public HashMap<String, Object> createKaryawan(@Valid @RequestBody ArrayList<KaryawanDTO> karyawanDto) {
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
-    	@Valid ArrayList<KaryawanDTO> listKaryawans = karyawanDto;
-    	String message;
-    	
+    	ArrayList<KaryawanDTO> listKaryawans = karyawanDto;
+    	ArrayList<Karyawan> resultSuccess = new ArrayList<Karyawan>();
+    	ArrayList<Karyawan> resultError = new ArrayList<Karyawan>();
+    	String message = "";
+    	String errorMessage = "";
+    	boolean isDuplicated = false;
     	for(KaryawanDTO k : listKaryawans) {
     		Karyawan karyawan = convertToEntity(k);
-    		karyawanRepository.save(karyawan);
+    		isDuplicated = noKtpValidation(k);
+    		if(!isDuplicated) {
+    			karyawanRepository.save(karyawan);
+    			resultSuccess.add(karyawan);
+    		} else {
+    			resultError.add(karyawan);
+    			errorMessage = "Nomor KTP is already in Database!";
+    		}
+    		
     	}
     
-    	if(listKaryawans == null) {
+    	if(listKaryawans.isEmpty() || !resultError.isEmpty() || resultSuccess.isEmpty()) {
     		message = "Create Failed!";
     	} else {
     		message = "Create Success!";
     	}
     	
     	showHashMap.put("Message", message);
-    	showHashMap.put("Total Insert", listKaryawans.size());
-    	showHashMap.put("Data", listKaryawans);
+    	showHashMap.put("Error Message", errorMessage);
+    	showHashMap.put("Total Insert Success", resultSuccess.size());
+    	showHashMap.put("Total Insert Failed", resultError.size());
+    	showHashMap.put("Data Success", resultSuccess);
+    	showHashMap.put("Data Failed", resultError);
     	
     	return showHashMap;
     }
