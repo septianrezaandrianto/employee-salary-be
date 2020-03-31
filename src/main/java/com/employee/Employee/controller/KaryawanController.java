@@ -158,7 +158,6 @@ public class KaryawanController {
     	karyawanRepository.delete(karyawan);
 
         showHashMap.put("Messages", "Delete Data Success!");
-        showHashMap.put("Delete data :", karyawan);
     	return showHashMap;
     }
 }
