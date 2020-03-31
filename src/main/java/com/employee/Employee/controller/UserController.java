@@ -68,8 +68,14 @@ public class UserController {
 	 @GetMapping("/user/{id}")
 	 public HashMap<String, Object> getById(@PathVariable(value = "id") Long id){
 		HashMap<String, Object> showHashMap = new HashMap<String, Object>();
-		User user = userRepository.findById(id)
-				.orElse(null);
+		User user = new User();
+		for(User usr: userRepository.findAll()) {
+			if(usr.getidUser() == id) {
+				user = usr;
+			}
+		}
+//		User user = userRepository.findById(id)
+//				.orElse(null);
 		UserDTO userDto = convertToDTO(user);
 		showHashMap.put("Messages", "Read Data Success");
 		showHashMap.put("Data", userDto);
@@ -108,34 +114,37 @@ public class UserController {
     	
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
     	String message;
-    	int idUser = id.intValue();
-    	User user = userRepository.findById(id)
-    			 .orElse(null);
+    	//int idUser = id.intValue();
+//    	User user = userRepository.findById(id)
+//    			 .orElse(null);
+    	User user = new User();
+		for(User usr: userRepository.findAll()) {
+			if(usr.getidUser() == id) {
+				user = usr;
+			}
+		}
     	
-    	List<UserDTO> resultList = new ArrayList<UserDTO>();
-    	resultList.add(userDetails);
-    	
+    	UserDTO tempDTO = convertToDTO(user);
+    	userDetails.setIdUser(tempDTO.getIdUser());
     	if(userDetails.getUsername() == null) {
-    		user.setUsername(resultList.get(idUser).getUsername());
+    		userDetails.setUsername(tempDTO.getUsername());
     	}
     	if(userDetails.getPassword() == null) {
-    		user.setPassword(resultList.get(idUser).getPassword());
+    		userDetails.setPassword(tempDTO.getPassword());
     	}
     	if(userDetails.getStatus() == null) {
-    		user.setStatus(resultList.get(idUser).getStatus());
+    		userDetails.setStatus(tempDTO.getStatus());
     	}
-    	userRepository.updateUser(id, user.getUsername(), user.getPassword(), user.getStatus());
-    	
-    	
-    	if(resultList.isEmpty()) {
+    	user = convertToEntity(userDetails);
+    	userRepository.save(user);
+    	if(user == null) {
     		message = "Update Failed!";
     	} else {
     		message = "Update Success!";
     	}
     	
     	showHashMap.put("Message", message);
-    	showHashMap.put("Total Update", resultList.size());
-    	showHashMap.put("Data", resultList);
+    	showHashMap.put("Data", user);
     	
     	return showHashMap;
     }
