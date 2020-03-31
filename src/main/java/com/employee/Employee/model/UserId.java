@@ -10,23 +10,23 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class UserId implements java.io.Serializable {
 
-	private int idUser;
+	private Long idUser;
 	private String username;
 
 	public UserId() {
 	}
 
-	public UserId(int idUser, String username) {
+	public UserId(Long idUser, String username) {
 		this.idUser = idUser;
 		this.username = username;
 	}
 
 	@Column(name = "id_user", nullable = false)
-	public int getIdUser() {
+	public long getIdUser() {
 		return this.idUser;
 	}
 
-	public void setIdUser(int idUser) {
+	public void setIdUser(Long idUser) {
 		this.idUser = idUser;
 	}
 
@@ -56,7 +56,7 @@ public class UserId implements java.io.Serializable {
 	public int hashCode() {
 		int result = 17;
 
-		result = 37 * result + this.getIdUser();
+		result = 37 * result + idUser.intValue();
 		result = 37 * result + (getUsername() == null ? 0 : this.getUsername().hashCode());
 		return result;
 	}

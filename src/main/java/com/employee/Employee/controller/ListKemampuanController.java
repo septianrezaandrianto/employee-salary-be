@@ -47,19 +47,19 @@ public class ListKemampuanController {
 			 listKemampuanDto.setKaryawan(karyawan);
 			 if(listKemampuan.getKaryawan().getPosisi() != null) {
 				 PosisiDTO posisi = modelMapper.map(listKemampuan.getKaryawan().getPosisi(), PosisiDTO.class);
-				 listKemampuanDto.getKaryawan().setPosisiDto(posisi);
+				 listKemampuanDto.getKaryawan().setPosisi(posisi);
 			 }
 			 if(listKemampuan.getKaryawan().getPenempatan() != null) {
 				 PenempatanDTO penempatan = modelMapper.map(listKemampuan.getKaryawan().getPenempatan(), PenempatanDTO.class);
-				 listKemampuanDto.getKaryawan().setPenempatanDto(penempatan);
+				 listKemampuanDto.getKaryawan().setPenempatan(penempatan);
 			 }
 			 if(listKemampuan.getKaryawan().getTingkatan() != null) {
 				 TingkatanDTO tingkatan = modelMapper.map(listKemampuan.getKaryawan().getTingkatan(), TingkatanDTO.class);
-				 listKemampuanDto.getKaryawan().setTingkatanDto(tingkatan);
+				 listKemampuanDto.getKaryawan().setTingkatan(tingkatan);
 			 }
 			 if(listKemampuan.getKaryawan().getAgama() != null) {
 				 AgamaDTO agama = modelMapper.map(listKemampuan.getKaryawan().getAgama(), AgamaDTO.class);
-				 listKemampuanDto.getKaryawan().setAgamaDto(agama);
+				 listKemampuanDto.getKaryawan().setAgama(agama);
 			 }
 		 }
 		 

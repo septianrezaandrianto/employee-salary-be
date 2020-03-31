@@ -16,8 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.employee.Employee.dto.AgamaDTO;
 import com.employee.Employee.dto.KaryawanDTO;
 import com.employee.Employee.dto.PendapatanDTO;
+import com.employee.Employee.dto.PenempatanDTO;
+import com.employee.Employee.dto.PosisiDTO;
+import com.employee.Employee.dto.TingkatanDTO;
 import com.employee.Employee.model.Karyawan;
 import com.employee.Employee.model.Pendapatan;
 import com.employee.Employee.repository.PendapatanRepository;
@@ -34,6 +38,31 @@ public class PendapatanController {
 //	Convert Entity To DTO
 	private PendapatanDTO convertEntityToDTO (Pendapatan pendapatan) {
 		PendapatanDTO pendapatanDto = modelMapper.map(pendapatan, PendapatanDTO.class);
+		
+		if (pendapatan.getKaryawan() != null) {
+			KaryawanDTO karyawanDto = modelMapper.map(pendapatan.getKaryawan(), KaryawanDTO.class);
+			pendapatanDto.setKaryawanDto(karyawanDto);
+		}
+		
+		if(pendapatan.getKaryawan().getPosisi() != null) {
+			PosisiDTO posisiDto = modelMapper.map(pendapatan.getKaryawan().getPosisi(), PosisiDTO.class);
+			pendapatanDto.getKaryawanDto().setPosisi(posisiDto);
+		}
+		
+		if(pendapatan.getKaryawan().getPenempatan() != null) {
+			PenempatanDTO penempatanDto = modelMapper.map(pendapatan.getKaryawan().getPenempatan(), PenempatanDTO.class);
+			pendapatanDto.getKaryawanDto().setPenempatan(penempatanDto);
+		}
+		
+		if (pendapatan.getKaryawan().getTingkatan() != null) {
+			TingkatanDTO tingkatanDto = modelMapper.map(pendapatan.getKaryawan().getTingkatan(), TingkatanDTO.class);
+			pendapatanDto.getKaryawanDto().setTingkatan(tingkatanDto);
+		}
+		
+		if (pendapatan.getKaryawan().getAgama() != null) {
+			AgamaDTO agamaDto = modelMapper.map(pendapatan.getKaryawan().getAgama(), AgamaDTO.class);
+			pendapatanDto.getKaryawanDto().setAgama(agamaDto);
+		}
 	return pendapatanDto;
 	}
 	
@@ -43,11 +72,6 @@ public class PendapatanController {
 	return pendapatan;
 	}
 	
-//	Convert Karyawan DTO To Entity
-	private Karyawan convertKaryawanDTOToEntity (KaryawanDTO karyawanDTO) {
-		Karyawan karyawan = modelMapper.map(karyawanDTO, Karyawan.class);
-	return karyawan;
-	}
 	
 //	Melihat seluruh Data Pendapatan
 	@GetMapping("/pendapatan/all")
@@ -123,7 +147,7 @@ public class PendapatanController {
 		pendapatanDTO.setIdPendapatan(pendapatan.getIdPendapatan());
 		
 		if (pendapatanDTO.getKaryawanDto() != null) {
-			pendapatan.setKaryawan(convertKaryawanDTOToEntity(pendapatanDTO.getKaryawanDto()));
+			pendapatan.setKaryawan(convertDTOToEntity(pendapatanDTO).getKaryawan());
 		}
 		
 		if (pendapatanDTO.getTanggalGaji() != null) {

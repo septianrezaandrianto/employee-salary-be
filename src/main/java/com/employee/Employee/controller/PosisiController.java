@@ -123,11 +123,11 @@ public class PosisiController {
    public HashMap<String, Object> delete(@PathVariable(value = "id") int id) {
    	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
    	Posisi posisi = posisiRepository.findById(id).orElse(null);
-
+   	PosisiDTO posisiDTO = convertToDTO(posisi);
    	posisiRepository.delete(posisi);
 
     showHashMap.put("Messages", "Delete Data Success!");
-    showHashMap.put("Delete data :", posisi);
+    showHashMap.put("Delete data :", posisiDTO);
    	return showHashMap;
    }
 }

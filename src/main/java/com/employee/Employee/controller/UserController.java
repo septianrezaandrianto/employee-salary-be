@@ -66,7 +66,7 @@ public class UserController {
 	 
 	 // Read User By ID
 	 @GetMapping("/user/{id}")
-	 public HashMap<String, Object> getById(@PathVariable(value = "id") Integer id){
+	 public HashMap<String, Object> getById(@PathVariable(value = "id") Long id){
 		HashMap<String, Object> showHashMap = new HashMap<String, Object>();
 		User user = userRepository.findById(id)
 				.orElse(null);
@@ -103,22 +103,29 @@ public class UserController {
 	
 	// Update a User
     @PutMapping("/user/update/{id}")
-    public HashMap<String, Object> updateUser(@PathVariable(value = "id") Integer id,
+    public HashMap<String, Object> updateUser(@PathVariable(value = "id") Long id,
             @Valid @RequestBody UserDTO userDetails) {
     	
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
     	String message;
-    
+    	int idUser = id.intValue();
     	User user = userRepository.findById(id)
     			 .orElse(null);
-
-    	user.setPassword(userDetails.getPassword());
-    	user.setStatus(userDetails.getStatus());
     	
-    	User updateUser = userRepository.save(user);
+    	List<UserDTO> resultList = new ArrayList<UserDTO>();
+    	resultList.add(userDetails);
     	
-    	List<User> resultList = new ArrayList<User>();
-    	resultList.add(updateUser);
+    	if(userDetails.getUsername() == null) {
+    		user.setUsername(resultList.get(idUser).getUsername());
+    	}
+    	if(userDetails.getPassword() == null) {
+    		user.setPassword(resultList.get(idUser).getPassword());
+    	}
+    	if(userDetails.getStatus() == null) {
+    		user.setStatus(resultList.get(idUser).getStatus());
+    	}
+    	userRepository.updateUser(id, user.getUsername(), user.getPassword(), user.getStatus());
+    	
     	
     	if(resultList.isEmpty()) {
     		message = "Update Failed!";
@@ -135,12 +142,12 @@ public class UserController {
     
     // Delete a User
     @DeleteMapping("/user/delete/{id}")
-    public HashMap<String, Object> delete(@PathVariable(value = "id") Integer id) {
+    public HashMap<String, Object> delete(@PathVariable(value = "id") Long id) {
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
     	User user = userRepository.findById(id)
     			.orElse(null);
 
-    	userRepository.delete(user);
+    	userRepository.deteleUser(id);;
 
         showHashMap.put("Messages", "Delete Data Success!");
         showHashMap.put("Delete data :", user);
