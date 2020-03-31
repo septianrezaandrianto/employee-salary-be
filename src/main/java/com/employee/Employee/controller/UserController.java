@@ -86,11 +86,26 @@ public class UserController {
 	public HashMap<String, Object> createUser(@Valid @RequestBody ArrayList<UserDTO> userDTO) {
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
     	@Valid ArrayList<UserDTO> listUsers = userDTO;
+    	User user = new User();
     	String message;
     	
-    	for(UserDTO d : listUsers) {
-    		User user = convertToEntity(d);
-    		userRepository.save(user);
+    	for(UserDTO e : listUsers) {
+    		int number = 1;
+    		boolean isAlreadyIn = false;
+    		for(User d : userRepository.findAll()) {
+    			if(e.getUsername().equalsIgnoreCase(d.getUsername())) {
+    				isAlreadyIn = true;
+    				break;
+    			}
+    		}
+    		if(isAlreadyIn) {
+    			showHashMap.put(number+". Create Failed on", e.getUsername());
+    		}else {
+    			showHashMap.put(number+". Create Success on", e.getUsername());
+    			user = convertToEntity(e);
+        		userRepository.save(user);
+    		}
+    		number++;
     	}
     
     	if(listUsers == null) {
