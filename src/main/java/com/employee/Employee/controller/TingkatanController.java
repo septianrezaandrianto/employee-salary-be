@@ -96,13 +96,27 @@ public class TingkatanController {
 	@PostMapping("/tingkatan/add")
 	public HashMap<String, Object> addTingkatan (@Valid @RequestBody TingkatanDTO tingkatanDTO) {
 		
+		boolean isValid = false;
 		HashMap<String, Object> mapTingkatan = new HashMap<String, Object>();
 		
-		Tingkatan tingkatan = convertDTOToEntity(tingkatanDTO);
 		
-		mapTingkatan.put("Message" , "Add Success");
-		mapTingkatan.put("Data", tingkatanRepository.save(tingkatan));
+		for (Tingkatan ting : tingkatanRepository.findAll()) {
+			
+			if (ting.getNamaTingkatan().equalsIgnoreCase(tingkatanDTO.getNamaTingkatan())) {
+				mapTingkatan.put("Message" , "Sorry Data has been already!");
+				isValid =true;
+				break;
+			
+			}		
+		}
 		
+		if (!isValid) {
+			Tingkatan tingkatan = convertDTOToEntity(tingkatanDTO);
+			mapTingkatan.put("Message" , "Add Success");
+			mapTingkatan.put("Data", tingkatanRepository.save(tingkatan));
+			
+		}
+	
 	return mapTingkatan;
 	}
 	
