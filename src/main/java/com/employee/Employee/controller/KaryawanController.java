@@ -154,10 +154,12 @@ public class KaryawanController {
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
     	Karyawan karyawan = karyawanRepository.findById(id)
     			.orElse(null);
-
+    	
+       	KaryawanDTO karyawanDto = convertToDTO(karyawan);
     	karyawanRepository.delete(karyawan);
 
         showHashMap.put("Messages", "Delete Data Success!");
+        showHashMap.put("Delete data :", karyawanDto);
     	return showHashMap;
     }
 }

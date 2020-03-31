@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class UserDTO implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
-	private int idUser;
+	private Long idUser;
 	private String username;
 	private String password;
 	private Short status;
@@ -15,7 +15,7 @@ public class UserDTO implements Serializable{
 		// TODO Auto-generated constructor stub
 	}
 
-	public UserDTO(int idUser, String username, String password, Short status) {
+	public UserDTO(Long idUser, String username, String password, Short status) {
 		super();
 		this.idUser = idUser;
 		this.username = username;
@@ -23,7 +23,7 @@ public class UserDTO implements Serializable{
 		this.status = status;
 	}
 
-	public int getIdUser() {
+	public Long getIdUser() {
 		return idUser;
 	}
 
@@ -39,7 +39,7 @@ public class UserDTO implements Serializable{
 		return status;
 	}
 
-	public void setIdUser(int idUser) {
+	public void setIdUser(Long idUser) {
 		this.idUser = idUser;
 	}
 
