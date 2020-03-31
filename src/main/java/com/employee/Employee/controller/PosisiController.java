@@ -76,26 +76,16 @@ public class PosisiController {
 	 
 	// Create a new User
 	@PostMapping("/Posisi/add")
-	public HashMap<String, Object> createUser(@Valid @RequestBody ArrayList<PosisiDTO> posisiDTO) {
+	public HashMap<String, Object> createUser(@Valid @RequestBody PosisiDTO posisiDTO) {
 	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
-	@Valid ArrayList<PosisiDTO> listPosisi = posisiDTO;
-	String message;
-   	
-   	for(PosisiDTO tempPosisi : listPosisi) {
-   		Posisi posisi = convertToEntity(tempPosisi);
-   		posisiRepository.save(posisi);
-   	}
-   
-   	if(listPosisi == null) {
-   		message = "Create Failed!";
+	 	
+   	if(checkAlreadyPosisi(posisiDTO)) {
+   		showHashMap.put("Message", "Create Succes");
+   	   	showHashMap.put("Data", convertToDTO(posisiRepository.save(convertToEntity(posisiDTO))));
    	} else {
-   		message = "Create Success!";
+   		showHashMap.put("Message : ", "Failed, Nama Posisi is already exist");
    	}
-   	
-   	showHashMap.put("Message", message);
-   	showHashMap.put("Total Insert", listPosisi.size());
-   	showHashMap.put("Data", listPosisi);
-   	
+   			
    	return showHashMap;
    }
 	
@@ -130,5 +120,18 @@ public class PosisiController {
     showHashMap.put("Delete data :", posisiDTO);
    	return showHashMap;
    }
+      
+   //Validation for Nama Posisi in Table Posisi
+   public boolean checkAlreadyPosisi(PosisiDTO posisiDTO) {
+	   boolean isAlready=true;
+	   for(Posisi posisi : posisiRepository.findAll()) {
+		   if(posisiDTO.getNamaPosisi().equalsIgnoreCase(posisi.getNamaPosisi()) ) {
+			   isAlready = false;
+		   }		   
+	   }
+	   
+	return isAlready;
+   }
+   
 }
 	 
