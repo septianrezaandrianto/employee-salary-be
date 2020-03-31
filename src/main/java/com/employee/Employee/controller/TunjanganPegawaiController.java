@@ -40,7 +40,7 @@ public class TunjanganPegawaiController {
 	}
 	
 	//Read All Tunjangan Pegawai
-	@GetMapping("/tunjanganPegawai/add")
+	@GetMapping("/tunjanganPegawai/all")
 	public HashMap<String, Object>readAllParameter(){
 		HashMap<String, Object> hmTunjanganPegawai = new HashMap<String, Object>();
 		List<TunjanganPegawaiDTO> tunjanganPegawaiDTOs = new ArrayList<TunjanganPegawaiDTO>();
@@ -92,10 +92,10 @@ public class TunjanganPegawaiController {
 		
 		tunjanganPegawaiDTODetails.setIdTunjanganPegawai(tunjanganPegawai.getIdTunjanganPegawai());
 		
-		if(tunjanganPegawaiDTODetails.getPosisiDTO() != null) {
+		if(tunjanganPegawaiDTODetails.getPosisi() != null) {
 			tunjanganPegawai.setPosisi(convertToEntity(tunjanganPegawaiDTODetails).getPosisi());
 		}
-		if(tunjanganPegawaiDTODetails.getTingkatanDTO() != null) {
+		if(tunjanganPegawaiDTODetails.getTingkatan() != null) {
 			tunjanganPegawai.setTingkatan(convertToEntity(tunjanganPegawaiDTODetails).getTingkatan());
 		}
 		
@@ -119,8 +119,10 @@ public class TunjanganPegawaiController {
 			
 		tunjanganPegawaiRepository.delete(tunjanganPegawai);
 			
+		TunjanganPegawaiDTO tunjanganPegawaiDTO = convertToDTO(tunjanganPegawai);
+		
 		hmTunjanganPegawai.put("Message : ", "Delete Tunjangan Pegawai Succes!");
-		hmTunjanganPegawai.put("Data : ", tunjanganPegawai);
+		hmTunjanganPegawai.put("Data : ", tunjanganPegawaiDTO);
 			
 		return hmTunjanganPegawai;
 	}
