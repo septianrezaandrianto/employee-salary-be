@@ -17,9 +17,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.employee.Employee.dto.AgamaDTO;
 import com.employee.Employee.dto.KaryawanDTO;
 import com.employee.Employee.dto.KemampuanDTO;
 import com.employee.Employee.dto.ListKemampuanDTO;
+import com.employee.Employee.dto.PenempatanDTO;
+import com.employee.Employee.dto.PosisiDTO;
+import com.employee.Employee.dto.TingkatanDTO;
 import com.employee.Employee.model.ListKemampuan;
 import com.employee.Employee.repository.ListKemampuanRepository;
 
@@ -41,6 +45,22 @@ public class ListKemampuanController {
 		 if(listKemampuan.getKaryawan() != null) {
 			 KaryawanDTO karyawan = modelMapper.map(listKemampuan.getKaryawan(), KaryawanDTO.class);
 			 listKemampuanDto.setKaryawan(karyawan);
+			 if(listKemampuan.getKaryawan().getPosisi() != null) {
+				 PosisiDTO posisi = modelMapper.map(listKemampuan.getKaryawan().getPosisi(), PosisiDTO.class);
+				 listKemampuanDto.getKaryawan().setPosisiDto(posisi);
+			 }
+			 if(listKemampuan.getKaryawan().getPenempatan() != null) {
+				 PenempatanDTO penempatan = modelMapper.map(listKemampuan.getKaryawan().getPenempatan(), PenempatanDTO.class);
+				 listKemampuanDto.getKaryawan().setPenempatanDto(penempatan);
+			 }
+			 if(listKemampuan.getKaryawan().getTingkatan() != null) {
+				 TingkatanDTO tingkatan = modelMapper.map(listKemampuan.getKaryawan().getTingkatan(), TingkatanDTO.class);
+				 listKemampuanDto.getKaryawan().setTingkatanDto(tingkatan);
+			 }
+			 if(listKemampuan.getKaryawan().getAgama() != null) {
+				 AgamaDTO agama = modelMapper.map(listKemampuan.getKaryawan().getAgama(), AgamaDTO.class);
+				 listKemampuanDto.getKaryawan().setAgamaDto(agama);
+			 }
 		 }
 		 
 		 return listKemampuanDto;
@@ -115,18 +135,16 @@ public class ListKemampuanController {
    public HashMap<String, Object> update(@PathVariable(value = "id") Integer id, @Valid @RequestBody ListKemampuanDTO listKemampuanDto) {
 	HashMap<String, Object> process = new HashMap<String, Object>();
 	ListKemampuan tempListKemampuan = listKemampuanRepository.findById(id).orElse(null);      
-	
-	listKemampuanDto.setIdListKemampuan(tempListKemampuan.getIdListKemampuan());
-    if (listKemampuanDto.getKemampuan() == null) {
-    	KemampuanDTO kemampuan = modelMapper.map(tempListKemampuan.getKemampuan(), KemampuanDTO.class);
-    	listKemampuanDto.setKemampuan(kemampuan);
+	ListKemampuanDTO tempDTO = convertToDTO(tempListKemampuan);
+	listKemampuanDto.setIdListKemampuan(tempDTO.getIdListKemampuan());
+    if (listKemampuanDto.getKemampuan() == null) {  	
+    	listKemampuanDto.setKemampuan(tempDTO.getKemampuan());
     }
     if (listKemampuanDto.getKaryawan() == null) {
-    	KaryawanDTO karyawan = modelMapper.map(tempListKemampuan.getKaryawan(), KaryawanDTO.class);
-    	listKemampuanDto.setKaryawan(karyawan);
+    	listKemampuanDto.setKaryawan(tempDTO.getKaryawan());
     }
     if (listKemampuanDto.getNilaiKemampuan() == null) {
-    	listKemampuanDto.setNilaiKemampuan(tempListKemampuan.getNilaiKemampuan());
+    	listKemampuanDto.setNilaiKemampuan(tempDTO.getNilaiKemampuan());
     }
 
     tempListKemampuan = convertToEntity(listKemampuanDto);
@@ -142,11 +160,11 @@ public class ListKemampuanController {
    public HashMap<String, Object> delete(@PathVariable(value = "id") Integer id) {
    	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
    	ListKemampuan listKemampuan = listKemampuanRepository.findById(id).orElse(null);
-
+   	ListKemampuanDTO listKemampuanDTO = convertToDTO(listKemampuan);
    	listKemampuanRepository.delete(listKemampuan);
 
     showHashMap.put("Messages", "Delete Data Success!");
-    showHashMap.put("Delete data :", listKemampuan);
+    showHashMap.put("Delete data :", listKemampuanDTO);
    	return showHashMap;
    }
 }
