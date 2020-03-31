@@ -111,14 +111,21 @@ public class UserController {
     
     	User user = userRepository.findById(id)
     			 .orElse(null);
-
-    	user.setPassword(userDetails.getPassword());
-    	user.setStatus(userDetails.getStatus());
     	
-    	User updateUser = userRepository.save(user);
+    	List<UserDTO> resultList = new ArrayList<UserDTO>();
+    	resultList.add(userDetails);
     	
-    	List<User> resultList = new ArrayList<User>();
-    	resultList.add(updateUser);
+    	if(userDetails.getUsername() == null) {
+    		user.setUsername(resultList.get(id).getUsername());
+    	}
+    	if(userDetails.getPassword() == null) {
+    		user.setPassword(resultList.get(id).getPassword());
+    	}
+    	if(userDetails.getStatus() == null) {
+    		user.setStatus(resultList.get(id).getStatus());
+    	}
+    	userRepository.updateUser(id, user.getUsername(), user.getPassword(), user.getStatus());
+    	
     	
     	if(resultList.isEmpty()) {
     		message = "Update Failed!";
@@ -140,7 +147,7 @@ public class UserController {
     	User user = userRepository.findById(id)
     			.orElse(null);
 
-    	userRepository.delete(user);
+    	userRepository.deteleUser(id);;
 
         showHashMap.put("Messages", "Delete Data Success!");
         showHashMap.put("Delete data :", user);
