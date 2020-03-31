@@ -92,7 +92,7 @@ public class TingkatanController {
 		
 	return mapTingkatan;
 	}
-//	Menambahkan tingkatan
+//	Menambahkan tingkatan dengan validasi
 	@PostMapping("/tingkatan/add")
 	public HashMap<String, Object> addTingkatan (@Valid @RequestBody TingkatanDTO tingkatanDTO) {
 		
