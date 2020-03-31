@@ -66,10 +66,15 @@ public class UserController {
 	 
 	 // Read User By ID
 	 @GetMapping("/user/{id}")
-	 public HashMap<String, Object> getById(@PathVariable(value = "id") Long id){
+	 public HashMap<String, Object> getById(@PathVariable(value = "id") Integer id){
 		HashMap<String, Object> showHashMap = new HashMap<String, Object>();
-		User user = userRepository.findById(id)
-				.orElse(null);
+		User user = new User();
+		for(User usr: userRepository.findAll()) {
+			if(usr.getidUser() == id) {
+				user = usr;
+			}
+		}
+		
 		UserDTO userDto = convertToDTO(user);
 		showHashMap.put("Messages", "Read Data Success");
 		showHashMap.put("Data", userDto);
@@ -103,51 +108,56 @@ public class UserController {
 	
 	// Update a User
     @PutMapping("/user/update/{id}")
-    public HashMap<String, Object> updateUser(@PathVariable(value = "id") Long id,
+    public HashMap<String, Object> updateUser(@PathVariable(value = "id") Integer id,
             @Valid @RequestBody UserDTO userDetails) {
     	
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
     	String message;
-    	int idUser = id.intValue();
-    	User user = userRepository.findById(id)
-    			 .orElse(null);
     	
-    	List<UserDTO> resultList = new ArrayList<UserDTO>();
-    	resultList.add(userDetails);
+    	User user = new User();
+		for(User usr: userRepository.findAll()) {
+			if(usr.getidUser() == id) {
+				user = usr;
+			}
+		}
     	
+    	UserDTO tempDTO = convertToDTO(user);
+    	userDetails.setIdUser(tempDTO.getIdUser());
     	if(userDetails.getUsername() == null) {
-    		user.setUsername(resultList.get(idUser).getUsername());
+    		userDetails.setUsername(tempDTO.getUsername());
     	}
     	if(userDetails.getPassword() == null) {
-    		user.setPassword(resultList.get(idUser).getPassword());
+    		userDetails.setPassword(tempDTO.getPassword());
     	}
     	if(userDetails.getStatus() == null) {
-    		user.setStatus(resultList.get(idUser).getStatus());
+    		userDetails.setStatus(tempDTO.getStatus());
     	}
-    	userRepository.updateUser(id, user.getUsername(), user.getPassword(), user.getStatus());
-    	
-    	
-    	if(resultList.isEmpty()) {
+    	user = convertToEntity(userDetails);
+    	userRepository.save(user);
+    	if(user == null) {
     		message = "Update Failed!";
     	} else {
     		message = "Update Success!";
     	}
     	
     	showHashMap.put("Message", message);
-    	showHashMap.put("Total Update", resultList.size());
-    	showHashMap.put("Data", resultList);
+    	showHashMap.put("Data", user);
     	
     	return showHashMap;
     }
     
     // Delete a User
     @DeleteMapping("/user/delete/{id}")
-    public HashMap<String, Object> delete(@PathVariable(value = "id") Long id) {
+    public HashMap<String, Object> delete(@PathVariable(value = "id") Integer id) {
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
-    	User user = userRepository.findById(id)
-    			.orElse(null);
+    	User user = new User();
+		for(User usr: userRepository.findAll()) {
+			if(usr.getidUser() == id) {
+				user = usr;
+			}
+		}
 
-    	userRepository.deteleUser(id);;
+    	userRepository.delete(user);
 
         showHashMap.put("Messages", "Delete Data Success!");
         showHashMap.put("Delete data :", user);
