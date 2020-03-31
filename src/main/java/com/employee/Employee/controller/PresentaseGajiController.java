@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.employee.Employee.dto.PosisiDTO;
 import com.employee.Employee.dto.PresentaseGajiDTO;
+import com.employee.Employee.model.Posisi;
 import com.employee.Employee.model.PresentaseGaji;
 import com.employee.Employee.repository.PresentaseGajiRepository;
 
@@ -32,14 +34,22 @@ public class PresentaseGajiController {
 //	Convert Entity To DTO
 	private PresentaseGajiDTO convertEntityToDTO(PresentaseGaji presentaseGaji) {
 		PresentaseGajiDTO presentaseGajiDTO = modelMapper.map(presentaseGaji, PresentaseGajiDTO.class);
-	return presentaseGajiDTO;
+		
+		if (presentaseGaji.getPosisi() !=  null) {
+			PosisiDTO posisi =  modelMapper.map(presentaseGaji.getPosisi(), PosisiDTO.class);
+			presentaseGajiDTO.setPosisiDto(posisi);
+		}
+		
+	return presentaseGajiDTO; 
 	}
 	
 //	Convert DTO To Entity
 	private PresentaseGaji convertDTOToEntity (PresentaseGajiDTO presentaseGajiDTO) {
 		PresentaseGaji presentaseGaji = modelMapper.map(presentaseGajiDTO, PresentaseGaji.class);
+		
 	return presentaseGaji;
 	}
+	
 	
 //	Melihat Seluruh Data Presentase Gaji
 	@GetMapping ("/presentasegaji/all")
@@ -115,7 +125,7 @@ public class PresentaseGajiController {
 		
 		presentaseGajiDTO.setIdPresentaseGaji(presentaseGaji.getIdPresentaseGaji());
 		
-		if (presentaseGajiDTO.getPosisi() != null) {
+		if (presentaseGajiDTO.getPosisiDto() != null) {
 			presentaseGaji.setPosisi(convertDTOToEntity(presentaseGajiDTO).getPosisi());
 		}
 		

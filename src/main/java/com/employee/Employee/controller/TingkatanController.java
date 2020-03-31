@@ -62,7 +62,7 @@ public class TingkatanController {
 	
 //	Melihat tingkatan By Id
 	@GetMapping("/tingkatan/{id}")
-	public HashMap<String, Object> getTingkatanById (@PathVariable(value="id") Integer idTingkatan) {
+	public HashMap<String, Object> getTingkatanById (@PathVariable(value="id") int idTingkatan) {
 
 		HashMap<String, Object> mapTingkatan = new HashMap<String, Object>();
 		Tingkatan tingkatan  = tingkatanRepository.findById(idTingkatan).orElse(null);
@@ -77,11 +77,11 @@ public class TingkatanController {
 	
 //	Menghapus Tingkatan
 	@DeleteMapping("/tingkatan/delete/{id}")
-	public HashMap<String, Object> deleteTingkatan (@PathVariable(value="id") Integer idTingkatan) {
+	public HashMap<String, Object> deleteTingkatan(@PathVariable(value="id") int idTingkatan) {
 		
 		HashMap<String, Object> mapTingkatan = new HashMap<String, Object>();
 		
-		Tingkatan tingkatan =  tingkatanRepository.findById(idTingkatan).orElse(null);
+		Tingkatan tingkatan =  tingkatanRepository.findById(idTingkatan).get();
 		
 		tingkatanRepository.delete(tingkatan);
 		
@@ -107,7 +107,7 @@ public class TingkatanController {
 	
 //	Update tingkatan
 	@PutMapping("/tingkatan/update/{id}")
-	public HashMap<String, Object> updateTingkatan(@PathVariable(value="id") Integer idTingkatan, @Valid @RequestBody TingkatanDTO tingkatanDTO) {
+	public HashMap<String, Object> updateTingkatan(@PathVariable(value="id") int idTingkatan, @Valid @RequestBody TingkatanDTO tingkatanDTO) {
 		
 		HashMap<String, Object> mapTingkatan = new HashMap<String, Object>();
 		
