@@ -129,7 +129,6 @@ public class AgamaController {
 
     	agama.setNamaAgama(convertToEntity(agamaDetails).getNamaAgama());
     	
-    	
     	Agama updateAgama = agamaRepository.save(agama);
     	
     	List<Agama> resultList = new ArrayList<Agama>();
@@ -155,7 +154,7 @@ public class AgamaController {
     	Agama agama = agamaRepository.findById(id)
     			.orElse(null);
 
-    	agamaRepository.delete(agama);
+    	agamaRepository.delete(agamaRepository.findById(id).get());
 
         showHashMap.put("Messages", "Delete Data Success!");
         showHashMap.put("Delete data :", agama);

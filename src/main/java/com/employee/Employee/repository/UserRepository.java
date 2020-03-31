@@ -7,6 +7,6 @@ import com.employee.Employee.model.User;
 import com.employee.Employee.model.UserId;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, UserId> {
+public interface UserRepository extends JpaRepository<User, Integer> {
 
 }

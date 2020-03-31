@@ -3,8 +3,6 @@ package com.employee.Employee.dto;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import com.employee.Employee.model.Karyawan;
-
 public class PendapatanDTO {
 
 	private int idPendapatan;

@@ -21,7 +21,6 @@ import javax.persistence.Table;
 @Table(name = "agama", schema = "public")
 public class Agama implements java.io.Serializable {
 	
-	private static final long serialVersionUID = 1L;
 	private int idAgama;
 	private String namaAgama;
 	private Set<Karyawan> karyawans = new HashSet<Karyawan>(0);

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.employee.Employee.dto.UserDTO;
 import com.employee.Employee.model.User;
-import com.employee.Employee.model.UserId;
 import com.employee.Employee.repository.UserRepository;
 
 @RestController
@@ -67,7 +66,7 @@ public class UserController {
 	 
 	 // Read User By ID
 	 @GetMapping("/user/{id}")
-	 public HashMap<String, Object> getById(@PathVariable(value = "id") UserId id){
+	 public HashMap<String, Object> getById(@PathVariable(value = "id") Integer id){
 		HashMap<String, Object> showHashMap = new HashMap<String, Object>();
 		User user = userRepository.findById(id)
 				.orElse(null);
@@ -104,7 +103,7 @@ public class UserController {
 	
 	// Update a User
     @PutMapping("/user/update/{id}")
-    public HashMap<String, Object> updateUser(@PathVariable(value = "id") UserId id,
+    public HashMap<String, Object> updateUser(@PathVariable(value = "id") Integer id,
             @Valid @RequestBody UserDTO userDetails) {
     	
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
@@ -150,7 +149,7 @@ public class UserController {
     
     // Delete a User
     @DeleteMapping("/user/delete/{id}")
-    public HashMap<String, Object> delete(@PathVariable(value = "id") UserId id) {
+    public HashMap<String, Object> delete(@PathVariable(value = "id") Integer id) {
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
     	User user = userRepository.findById(id)
     			.orElse(null);

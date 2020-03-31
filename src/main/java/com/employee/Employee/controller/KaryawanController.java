@@ -37,14 +37,12 @@ public class KaryawanController {
 	 }
 	 
 	 public KaryawanDTO convertToDTO(Karyawan karyawan) {
-		 KaryawanDTO karyawanDto = modelMapper.map(karyawan, KaryawanDTO.class);
-         return karyawanDto;
-	 }
-	    
-    private Karyawan convertToEntity(KaryawanDTO karyawanDto) {
-    	Karyawan karyawan = modelMapper.map(karyawanDto, Karyawan.class);
-        return karyawan;
-    }
+	        return modelMapper.map(karyawan, KaryawanDTO.class);
+	    }
+
+     public Karyawan convertToEntity(KaryawanDTO karyawanDto) {
+        return modelMapper.map(karyawanDto, Karyawan.class);
+     }
 		 
 	 //Get All Karyawan
 	 @GetMapping("/karyawan/all")
@@ -114,22 +112,9 @@ public class KaryawanController {
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
     	String message;
     	
-    	List<Karyawan> listKaryawans = karyawanRepository.findAll();
-    	
-//    	for(Karyawan u : listKaryawans) {
-//    		if(u.getIdKaryawan() == id) {
-//    			if(karyawanDetails.getAgamaDto() == null) {
-//    				karyawanDetails.setAgamaDto(convertToDTO(listKaryawans).get(id).getAgama());
-//    	    	}
-//    	    	if(karyawanDetails.getPassword() == null) {
-//    	    		karyawanDetails.setPassword(listKaryawans.get(id.getIdKaryawan()).getPassword());
-//    	    	}
-//    		}
-//    	}	
-    	
     	Karyawan Karyawan = karyawanRepository.findById(id)
     			 .orElse(null);
-
+    	
     	Karyawan.setAgama(convertToEntity(karyawanDetails).getAgama());
     	Karyawan.setPosisi(convertToEntity(karyawanDetails).getPosisi());
     	Karyawan.setPenempatan(convertToEntity(karyawanDetails).getPenempatan());

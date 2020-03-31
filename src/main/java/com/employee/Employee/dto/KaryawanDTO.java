@@ -7,10 +7,10 @@ public class KaryawanDTO implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 	private int idKaryawan;
-	private PosisiDTO posisiDto;
-	private PenempatanDTO penempatanDto;
-	private TingkatanDTO tingkatanDto;
-	private AgamaDTO agamaDto;
+	private PosisiDTO posisi;
+	private PenempatanDTO penempatan;
+	private TingkatanDTO tingkatan;
+	private AgamaDTO agama;
 	private String nama;
 	private String noKtp;
 	private String alamat;
@@ -26,16 +26,16 @@ public class KaryawanDTO implements Serializable{
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
-	public KaryawanDTO(int idKaryawan, PosisiDTO posisiDto, PenempatanDTO penempatanDto, TingkatanDTO tingkatanDto,
-			AgamaDTO agamaDto, String nama, String noKtp, String alamat, Date tanggalLahir, Integer masaKerja,
+
+	public KaryawanDTO(int idKaryawan, PosisiDTO posisi, PenempatanDTO penempatan, TingkatanDTO tingkatan,
+			AgamaDTO agama, String nama, String noKtp, String alamat, Date tanggalLahir, Integer masaKerja,
 			Short statusPernikahan, Date kontrakAwal, Date kontrakAkhir, String jenisKelamin, Integer jumlahAnak) {
 		super();
 		this.idKaryawan = idKaryawan;
-		this.posisiDto = posisiDto;
-		this.penempatanDto = penempatanDto;
-		this.tingkatanDto = tingkatanDto;
-		this.agamaDto = agamaDto;
+		this.posisi = posisi;
+		this.penempatan = penempatan;
+		this.tingkatan = tingkatan;
+		this.agama = agama;
 		this.nama = nama;
 		this.noKtp = noKtp;
 		this.alamat = alamat;
@@ -52,20 +52,20 @@ public class KaryawanDTO implements Serializable{
 		return idKaryawan;
 	}
 
-	public PosisiDTO getPosisiDto() {
-		return this.posisiDto;
+	public PosisiDTO getPosisi() {
+		return posisi;
 	}
 
-	public PenempatanDTO getPenempatanDto() {
-		return this.penempatanDto;
+	public PenempatanDTO getPenempatan() {
+		return penempatan;
 	}
 
-	public TingkatanDTO getTingkatanDto() {
-		return this.tingkatanDto;
+	public TingkatanDTO getTingkatan() {
+		return tingkatan;
 	}
 
-	public AgamaDTO getAgamaDto() {
-		return this.agamaDto;
+	public AgamaDTO getAgama() {
+		return agama;
 	}
 
 	public String getNama() {
@@ -112,20 +112,20 @@ public class KaryawanDTO implements Serializable{
 		this.idKaryawan = idKaryawan;
 	}
 
-	public void setPosisiDto(PosisiDTO posisiDto) {
-		this.posisiDto = posisiDto;
+	public void setPosisi(PosisiDTO posisi) {
+		this.posisi = posisi;
 	}
 
-	public void setPenempatanDto(PenempatanDTO penempatanDto) {
-		this.penempatanDto = penempatanDto;
+	public void setPenempatan(PenempatanDTO penempatan) {
+		this.penempatan = penempatan;
 	}
 
-	public void setTingkatanDto(TingkatanDTO tingkatanDto) {
-		this.tingkatanDto = tingkatanDto;
+	public void setTingkatan(TingkatanDTO tingkatan) {
+		this.tingkatan = tingkatan;
 	}
 
-	public void setAgamaDto(AgamaDTO agamaDto) {
-		this.agamaDto = agamaDto;
+	public void setAgama(AgamaDTO agama) {
+		this.agama = agama;
 	}
 
 	public void setNama(String nama) {
@@ -167,5 +167,4 @@ public class KaryawanDTO implements Serializable{
 	public void setJumlahAnak(Integer jumlahAnak) {
 		this.jumlahAnak = jumlahAnak;
 	}
-	
 }
