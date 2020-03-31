@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.employee.Employee.dto.UserDTO;
 import com.employee.Employee.model.User;
+import com.employee.Employee.model.UserId;
 import com.employee.Employee.repository.UserRepository;
 
 @RestController
@@ -66,10 +67,15 @@ public class UserController {
 	 
 	 // Read User By ID
 	 @GetMapping("/user/{id}")
-	 public HashMap<String, Object> getById(@PathVariable(value = "id") Long id){
+	 public HashMap<String, Object> getById(@PathVariable(value = "id") UserId id){
 		HashMap<String, Object> showHashMap = new HashMap<String, Object>();
-		User user = userRepository.findById(id)
-				.orElse(null);
+		User user = new User();
+		for(User usr: userRepository.findAll()) {
+			if(usr.getId() == id) {
+				user = usr;
+			}
+		}
+		
 		UserDTO userDto = convertToDTO(user);
 		showHashMap.put("Messages", "Read Data Success");
 		showHashMap.put("Data", userDto);
@@ -81,12 +87,27 @@ public class UserController {
 	public HashMap<String, Object> createUser(@Valid @RequestBody ArrayList<UserDTO> userDTO) {
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
     	@Valid ArrayList<UserDTO> listUsers = userDTO;
+    	User user = new User();
     	String message;
     	
-    	for(UserDTO d : listUsers) {
-    		User user = convertToEntity(d);
-    		userRepository.save(user);
-    	}
+//    	for(UserDTO e : listUsers) {
+//    		int number = 1;
+//    		boolean isAlreadyIn = false;
+//    		for(User d : userRepository.findAll()) {
+//    			if(e.getUsername().equalsIgnoreCase(d.getUsername())) {
+//    				isAlreadyIn = true;
+//    				break;
+//    			}
+//    		}
+//    		if(isAlreadyIn) {
+//    			showHashMap.put(number+". Create Failed on", e.getUsername());
+//    		}else {
+//    			showHashMap.put(number+". Create Success on", e.getUsername());
+//    			user = convertToEntity(e);
+//        		userRepository.save(user);
+//    		}
+//    		number++;
+//    	}
     
     	if(listUsers == null) {
     		message = "Create Failed!";
@@ -103,51 +124,53 @@ public class UserController {
 	
 	// Update a User
     @PutMapping("/user/update/{id}")
-    public HashMap<String, Object> updateUser(@PathVariable(value = "id") Long id,
+    public HashMap<String, Object> updateUser(@PathVariable(value = "id") UserId id,
             @Valid @RequestBody UserDTO userDetails) {
     	
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
     	String message;
-    	int idUser = id.intValue();
-    	User user = userRepository.findById(id)
-    			 .orElse(null);
     	
-    	List<UserDTO> resultList = new ArrayList<UserDTO>();
-    	resultList.add(userDetails);
+    	User user = new User();
+		for(User usr: userRepository.findAll()) {
+			if(usr.getId() == id) {
+				user = usr;
+			}
+		}
     	
-    	if(userDetails.getUsername() == null) {
-    		user.setUsername(resultList.get(idUser).getUsername());
-    	}
+    	UserDTO tempDTO = convertToDTO(user);
+    	userDetails.setid(tempDTO.getid());
     	if(userDetails.getPassword() == null) {
-    		user.setPassword(resultList.get(idUser).getPassword());
+    		userDetails.setPassword(tempDTO.getPassword());
     	}
     	if(userDetails.getStatus() == null) {
-    		user.setStatus(resultList.get(idUser).getStatus());
+    		userDetails.setStatus(tempDTO.getStatus());
     	}
-    	userRepository.updateUser(id, user.getUsername(), user.getPassword(), user.getStatus());
-    	
-    	
-    	if(resultList.isEmpty()) {
+    	user = convertToEntity(userDetails);
+    	userRepository.save(user);
+    	if(user == null) {
     		message = "Update Failed!";
     	} else {
     		message = "Update Success!";
     	}
     	
     	showHashMap.put("Message", message);
-    	showHashMap.put("Total Update", resultList.size());
-    	showHashMap.put("Data", resultList);
+    	showHashMap.put("Data", user);
     	
     	return showHashMap;
     }
     
     // Delete a User
     @DeleteMapping("/user/delete/{id}")
-    public HashMap<String, Object> delete(@PathVariable(value = "id") Long id) {
+    public HashMap<String, Object> delete(@PathVariable(value = "id") UserId id) {
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
-    	User user = userRepository.findById(id)
-    			.orElse(null);
+    	User user = new User();
+		for(User usr: userRepository.findAll()) {
+			if(usr.getId() == id) {
+				user = usr;
+			}
+		}
 
-    	userRepository.deteleUser(id);;
+    	userRepository.delete(user);
 
         showHashMap.put("Messages", "Delete Data Success!");
         showHashMap.put("Delete data :", user);

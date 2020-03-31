@@ -61,10 +61,14 @@ public class PenempatanController {
     @PostMapping("/penempatan/add")
     public HashMap<String, Object> createPenempatan(@Valid @RequestBody PenempatanDTO penempatanDTO) {
         HashMap<String, Object> result = new HashMap<String, Object>();
-    
-        result.put("Message", "Success");
-        result.put("Data", convertToDTO(penempatanRepository.save(convertToEntity(penempatanDTO))));
-
+        
+        if (validateCity(penempatanDTO)) {
+            result.put("Message", "Success");
+            result.put("Data", convertToDTO(penempatanRepository.save(convertToEntity(penempatanDTO))));
+        } else {
+            result.put("Message", "Failed, data is already in database.");
+        }
+        
         return result;
     }
 
@@ -101,6 +105,19 @@ public class PenempatanController {
         result.put("Message", "Success");
 
         return result;
+    }
+
+    // City validate method 
+    public boolean validateCity(PenempatanDTO penempatanDTO) {
+        boolean isValid = true;
+
+        for (Penempatan tempPen : penempatanRepository.findAll()) {
+            if (penempatanDTO.getKotaPenempatan().replaceAll("\\s+", "").equalsIgnoreCase(tempPen.getKotaPenempatan().replaceAll("\\s+", ""))) {
+                isValid = false;
+            }
+        }
+
+        return isValid;
     }
 
     public PenempatanDTO convertToDTO(Penempatan penempatan) {
