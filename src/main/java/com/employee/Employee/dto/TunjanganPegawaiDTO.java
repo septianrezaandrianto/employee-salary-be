@@ -5,24 +5,21 @@ import java.math.BigDecimal;
 public class TunjanganPegawaiDTO {
 		
 	private int idTunjanganPegawai;
-	private PosisiDTO posisiDTO;
-	private TingkatanDTO tingkatanDTO;
+	private PosisiDTO posisi;
+	private TingkatanDTO tingkatan;
 	private BigDecimal besaranTujnaganPegawai;
 	
-	
-	public TunjanganPegawaiDTO(int idTunjanganPegawai, BigDecimal besaranTujnaganPegawai) {
-		super();
-		this.idTunjanganPegawai = idTunjanganPegawai;
-		this.besaranTujnaganPegawai = besaranTujnaganPegawai;
+
+	public TunjanganPegawaiDTO() {
+		
 	}
 
-
-	public TunjanganPegawaiDTO(int idTunjanganPegawai, PosisiDTO posisiDTO, TingkatanDTO tingkatanDTO,
+	public TunjanganPegawaiDTO(int idTunjanganPegawai, PosisiDTO posisi, TingkatanDTO tingkatan,
 			BigDecimal besaranTujnaganPegawai) {
 		super();
 		this.idTunjanganPegawai = idTunjanganPegawai;
-		this.posisiDTO = posisiDTO;
-		this.tingkatanDTO = tingkatanDTO;
+		this.posisi= posisi;
+		this.tingkatan = tingkatan;
 		this.besaranTujnaganPegawai = besaranTujnaganPegawai;
 	}
 
@@ -37,23 +34,23 @@ public class TunjanganPegawaiDTO {
 	}
 
 
-	public PosisiDTO getPosisiDTO() {
-		return posisiDTO;
+	public PosisiDTO getPosisi() {
+		return posisi;
 	}
 
 
-	public void setPosisiDTO(PosisiDTO posisiDTO) {
-		this.posisiDTO = posisiDTO;
+	public void setPosisi(PosisiDTO posisi) {
+		this.posisi = posisi;
 	}
 
 
-	public TingkatanDTO getTingkatanDTO() {
-		return tingkatanDTO;
+	public TingkatanDTO getTingkatan() {
+		return tingkatan;
 	}
 
 
-	public void setTingkatanDTO(TingkatanDTO tingkatanDTO) {
-		this.tingkatanDTO = tingkatanDTO;
+	public void setTingkatan(TingkatanDTO tingkatan) {
+		this.tingkatan = tingkatan;
 	}
 
 
