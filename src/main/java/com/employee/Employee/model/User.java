@@ -18,7 +18,7 @@ import javax.persistence.Table;
 @Table(name = "user", schema = "public")
 public class User implements java.io.Serializable {
 	
-	private int idUser;
+	private long idUser;
 	private String username;
 	private String password;
 	private Short status;
@@ -26,7 +26,7 @@ public class User implements java.io.Serializable {
 	public User() {
 	}
 
-	public User(int idUser, String username, String password, Short status) {
+	public User(long idUser, String username, String password, Short status) {
 		super();
 		this.idUser = idUser;
 		this.username = username;
@@ -38,7 +38,7 @@ public class User implements java.io.Serializable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator_user_id_user_seq")
 	@SequenceGenerator(name="generator_user_id_user_seq", sequenceName="user_id_user_seq", schema = "public", allocationSize = 1)	
 	@Column(name = "id_user", nullable = false)
-	public int getidUser() {
+	public long getidUser() {
 		return idUser;
 	}
 	
@@ -48,7 +48,7 @@ public class User implements java.io.Serializable {
 		return username;
 	}
 
-	public void setidUser(int idUser) {
+	public void setidUser(long idUser) {
 		this.idUser = idUser;
 	}
 

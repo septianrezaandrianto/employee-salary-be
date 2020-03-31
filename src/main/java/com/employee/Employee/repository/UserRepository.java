@@ -10,17 +10,17 @@ import org.springframework.transaction.annotation.Transactional;
 import com.employee.Employee.model.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Long> {
 	@Modifying
 	@Query
 	(value = "UPDATE 'User' SET usename = :username, password = :password, status = :status WHERE id_user = :id AND username = username", nativeQuery = true)
 	@Transactional
-	void updateUser(@Param("id") Integer id, @Param("username") String username, 
+	void updateUser(@Param("id") Long id, @Param("username") String username, 
 						@Param("password") String password,  @Param("status") short status);
 	
 	@Modifying
 	@Query
 	(value = "DELETE FROM 'User' Where id_user = :id", nativeQuery = true)
 	@Transactional
-	void deteleUser(@Param("id") Integer id);
+	void deteleUser(@Param("id") Long id);
 }
