@@ -85,12 +85,13 @@ public class TingkatanController {
 		
 		tingkatanRepository.delete(tingkatan);
 		
+		TingkatanDTO tingkatanDTO = convertEntityToDTO(tingkatan);
+		
 		mapTingkatan.put("Message" , "Delete Success");
-		mapTingkatan.put("Data" , tingkatan);
+		mapTingkatan.put("Data" , tingkatanDTO);
 		
 	return mapTingkatan;
 	}
-	
 //	Menambahkan tingkatan
 	@PostMapping("/tingkatan/add")
 	public HashMap<String, Object> addTingkatan (@Valid @RequestBody TingkatanDTO tingkatanDTO) {
