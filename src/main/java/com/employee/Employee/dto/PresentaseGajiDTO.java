@@ -7,7 +7,7 @@ import com.employee.Employee.model.Posisi;
 public class PresentaseGajiDTO {
 
 	private int idPresentaseGaji;
-	private Posisi posisi;
+	private PosisiDTO posisiDto;
 	private Integer idTingkatan;
 	private BigDecimal besaranGaji;
 	private Integer masaKerja;
@@ -17,29 +17,29 @@ public class PresentaseGajiDTO {
 		super();
 	}
 	
-	
-	public PresentaseGajiDTO(int idPresentaseGaji, Posisi posisi, Integer idTingkatan, BigDecimal besaranGaji,
+	public PresentaseGajiDTO(int idPresentaseGaji, PosisiDTO posisiDto, Integer idTingkatan, BigDecimal besaranGaji,
 			Integer masaKerja) {
 		super();
 		this.idPresentaseGaji = idPresentaseGaji;
-		this.posisi = posisi;
+		this.posisiDto = posisiDto;
 		this.idTingkatan = idTingkatan;
 		this.besaranGaji = besaranGaji;
 		this.masaKerja = masaKerja;
 	}
-	
-	
+
+
 	public int getIdPresentaseGaji() {
 		return idPresentaseGaji;
 	}
 	public void setIdPresentaseGaji(int idPresentaseGaji) {
 		this.idPresentaseGaji = idPresentaseGaji;
 	}
-	public Posisi getPosisi() {
-		return posisi;
+	public PosisiDTO getPosisiDto() {
+		return posisiDto;
 	}
-	public void setPosisi(Posisi posisi) {
-		this.posisi = posisi;
+
+	public void setPosisiDto(PosisiDTO posisiDto) {
+		this.posisiDto = posisiDto;
 	}
 	public Integer getIdTingkatan() {
 		return idTingkatan;
