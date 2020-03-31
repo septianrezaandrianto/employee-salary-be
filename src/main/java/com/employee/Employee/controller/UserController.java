@@ -108,24 +108,10 @@ public class UserController {
     	
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
     	String message;
-    	
-    	List<User> listUsers = userRepository.findAll();
-    	
-//    	for(User u : listUsers) {
-//    		if(u.getId() == id) {
-//    			if(UserDetails.getIdDto() == null) {
-//    				UserDetails.setIdDto(listUsers.get(id.getIdUser()).getId());
-//    	    	}
-//    	    	if(UserDetails.getPassword() == null) {
-//    	    		UserDetails.setPassword(listUsers.get(id.getIdUser()).getPassword());
-//    	    	}
-//    		}
-//    	}	
-    	
+    
     	User user = userRepository.findById(id)
     			 .orElse(null);
 
-//    	user.setId(UserDetails.getIdDto());
     	user.setPassword(userDetails.getPassword());
     	user.setStatus(userDetails.getStatus());
     	
