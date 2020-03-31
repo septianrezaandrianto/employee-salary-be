@@ -34,7 +34,16 @@ public class ListKemampuanController {
 	 
 	 public ListKemampuanDTO convertToDTO(ListKemampuan listKemampuan) {
 		 ListKemampuanDTO listKemampuanDto = modelMapper.map(listKemampuan, ListKemampuanDTO.class);
-        return listKemampuanDto;
+		 if(listKemampuan.getKemampuan() != null) {
+			 KemampuanDTO kemampuan = modelMapper.map(listKemampuan.getKemampuan(), KemampuanDTO.class);
+			 listKemampuanDto.setKemampuan(kemampuan);
+		 }
+		 if(listKemampuan.getKaryawan() != null) {
+			 KaryawanDTO karyawan = modelMapper.map(listKemampuan.getKaryawan(), KaryawanDTO.class);
+			 listKemampuanDto.setKaryawan(karyawan);
+		 }
+		 
+		 return listKemampuanDto;
 	 }
 	    
    private ListKemampuan convertToEntity(ListKemampuanDTO listKemampuanDto) {
