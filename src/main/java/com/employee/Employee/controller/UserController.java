@@ -66,7 +66,7 @@ public class UserController {
 	 
 	 // Read User By ID
 	 @GetMapping("/user/{id}")
-	 public HashMap<String, Object> getById(@PathVariable(value = "id") Long id){
+	 public HashMap<String, Object> getById(@PathVariable(value = "id") Integer id){
 		HashMap<String, Object> showHashMap = new HashMap<String, Object>();
 		User user = new User();
 		for(User usr: userRepository.findAll()) {
@@ -74,8 +74,7 @@ public class UserController {
 				user = usr;
 			}
 		}
-//		User user = userRepository.findById(id)
-//				.orElse(null);
+		
 		UserDTO userDto = convertToDTO(user);
 		showHashMap.put("Messages", "Read Data Success");
 		showHashMap.put("Data", userDto);
@@ -109,14 +108,12 @@ public class UserController {
 	
 	// Update a User
     @PutMapping("/user/update/{id}")
-    public HashMap<String, Object> updateUser(@PathVariable(value = "id") Long id,
+    public HashMap<String, Object> updateUser(@PathVariable(value = "id") Integer id,
             @Valid @RequestBody UserDTO userDetails) {
     	
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
     	String message;
-    	//int idUser = id.intValue();
-//    	User user = userRepository.findById(id)
-//    			 .orElse(null);
+    	
     	User user = new User();
 		for(User usr: userRepository.findAll()) {
 			if(usr.getidUser() == id) {
@@ -151,12 +148,16 @@ public class UserController {
     
     // Delete a User
     @DeleteMapping("/user/delete/{id}")
-    public HashMap<String, Object> delete(@PathVariable(value = "id") Long id) {
+    public HashMap<String, Object> delete(@PathVariable(value = "id") Integer id) {
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
-    	User user = userRepository.findById(id)
-    			.orElse(null);
+    	User user = new User();
+		for(User usr: userRepository.findAll()) {
+			if(usr.getidUser() == id) {
+				user = usr;
+			}
+		}
 
-    	userRepository.deteleUser(id);;
+    	userRepository.delete(user);
 
         showHashMap.put("Messages", "Delete Data Success!");
         showHashMap.put("Delete data :", user);
