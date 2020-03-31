@@ -162,11 +162,12 @@ public class ParameterPajakController {
    public HashMap<String, Object> delete(@PathVariable(value = "id") Integer id) {
    	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
    	ParameterPajak parameterPajak = parameterPajakRepository.findById(id).orElse(null);
-
+   	ParameterPajakDTO parameterPajakDto = convertToDTO(parameterPajak);
+   	
    	parameterPajakRepository.delete(parameterPajak);
 
     showHashMap.put("Messages", "Delete Data Success!");
-    showHashMap.put("Delete data :", parameterPajak);
+    showHashMap.put("Delete data :", parameterPajakDto);
    	return showHashMap;
    }
 }
