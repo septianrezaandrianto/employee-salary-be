@@ -76,14 +76,10 @@ public class KemampuanController {
 
         if (kemampuanDTO.getNamaKemampuan() != null) {
             updatedKemampuanDTO.setNamaKemampuan(kemampuanDTO.getNamaKemampuan());
-        } else {
-            updatedKemampuanDTO.setNamaKemampuan(updatedKemampuanDTO.getNamaKemampuan());
         }
 
         if (kemampuanDTO.getKategoriKemampuan() != null) {
             updatedKemampuanDTO.setKategoriKemampuan(kemampuanDTO.getKategoriKemampuan());
-        } else {
-            updatedKemampuanDTO.setKategoriKemampuan(updatedKemampuanDTO.getKategoriKemampuan());
         }
 
         result.put("Message", "Success");

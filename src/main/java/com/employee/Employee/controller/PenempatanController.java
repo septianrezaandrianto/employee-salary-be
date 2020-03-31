@@ -62,11 +62,11 @@ public class PenempatanController {
     public HashMap<String, Object> createPenempatan(@Valid @RequestBody PenempatanDTO penempatanDTO) {
         HashMap<String, Object> result = new HashMap<String, Object>();
         
-        if (validateCity(penempatanDTO)) {
+        if (validateCity(penempatanDTO.getKotaPenempatan())) {
             result.put("Message", "Success");
             result.put("Data", convertToDTO(penempatanRepository.save(convertToEntity(penempatanDTO))));
         } else {
-            result.put("Message", "Failed, data is already in database.");
+            result.put("Message", "Failed, city is already existed.");
         }
         
         return result;
@@ -77,22 +77,27 @@ public class PenempatanController {
     public HashMap<String, Object> updatePenempatan(@PathVariable(value = "id") Integer penempatanId, @Valid @RequestBody PenempatanDTO penempatanDTO) {
         HashMap<String, Object> result = new HashMap<String, Object>();
         PenempatanDTO updatedPenempatanDTO = convertToDTO(penempatanRepository.findById(penempatanId).get());
+        boolean isValid = true;
 
         if (penempatanDTO.getKotaPenempatan() != null) {
-            updatedPenempatanDTO.setKotaPenempatan(penempatanDTO.getKotaPenempatan());
-        } else {
-            updatedPenempatanDTO.setKotaPenempatan(updatedPenempatanDTO.getKotaPenempatan());
+            if (validateCity(penempatanDTO.getKotaPenempatan())) {
+                updatedPenempatanDTO.setKotaPenempatan(penempatanDTO.getKotaPenempatan());
+            } else {
+                isValid = false;
+            }
         }
 
         if (penempatanDTO.getUmkPenempatan() != null) {
             updatedPenempatanDTO.setUmkPenempatan(penempatanDTO.getUmkPenempatan());
-        } else {
-            updatedPenempatanDTO.setUmkPenempatan(updatedPenempatanDTO.getUmkPenempatan());
         }
 
-        result.put("Message", "Success");
-        result.put("Data", convertToDTO(penempatanRepository.save(convertToEntity(updatedPenempatanDTO))));
-
+        if (isValid) {
+            result.put("Message", "Success");
+            result.put("Data", convertToDTO(penempatanRepository.save(convertToEntity(updatedPenempatanDTO))));
+        } else {
+            result.put("Message", "Failed, city is already existed.");
+        }
+            
         return result;
     }
 
@@ -108,11 +113,11 @@ public class PenempatanController {
     }
 
     // City validate method 
-    public boolean validateCity(PenempatanDTO penempatanDTO) {
+    public boolean validateCity(String cityInput) {
         boolean isValid = true;
 
         for (Penempatan tempPen : penempatanRepository.findAll()) {
-            if (penempatanDTO.getKotaPenempatan().replaceAll("\\s+", "").equalsIgnoreCase(tempPen.getKotaPenempatan().replaceAll("\\s+", ""))) {
+            if (cityInput.replaceAll("\\s+", "").equalsIgnoreCase(tempPen.getKotaPenempatan().replaceAll("\\s+", ""))) {
                 isValid = false;
             }
         }
