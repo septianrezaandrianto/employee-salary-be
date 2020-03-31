@@ -46,22 +46,22 @@ public class PendapatanController {
 		
 		if(pendapatan.getKaryawan().getPosisi() != null) {
 			PosisiDTO posisiDto = modelMapper.map(pendapatan.getKaryawan().getPosisi(), PosisiDTO.class);
-			pendapatanDto.getKaryawanDto().setPosisiDto(posisiDto);
+			pendapatanDto.getKaryawanDto().setPosisi(posisiDto);
 		}
 		
 		if(pendapatan.getKaryawan().getPenempatan() != null) {
 			PenempatanDTO penempatanDto = modelMapper.map(pendapatan.getKaryawan().getPenempatan(), PenempatanDTO.class);
-			pendapatanDto.getKaryawanDto().setPenempatanDto(penempatanDto);
+			pendapatanDto.getKaryawanDto().setPenempatan(penempatanDto);
 		}
 		
 		if (pendapatan.getKaryawan().getTingkatan() != null) {
 			TingkatanDTO tingkatanDto = modelMapper.map(pendapatan.getKaryawan().getTingkatan(), TingkatanDTO.class);
-			pendapatanDto.getKaryawanDto().setTingkatanDto(tingkatanDto);
+			pendapatanDto.getKaryawanDto().setTingkatan(tingkatanDto);
 		}
 		
 		if (pendapatan.getKaryawan().getAgama() != null) {
 			AgamaDTO agamaDto = modelMapper.map(pendapatan.getKaryawan().getAgama(), AgamaDTO.class);
-			pendapatanDto.getKaryawanDto().setAgamaDto(agamaDto);
+			pendapatanDto.getKaryawanDto().setAgama(agamaDto);
 		}
 	return pendapatanDto;
 	}
