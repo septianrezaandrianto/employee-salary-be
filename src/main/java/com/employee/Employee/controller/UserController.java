@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.employee.Employee.dto.UserDTO;
 import com.employee.Employee.model.User;
-import com.employee.Employee.model.UserId;
 import com.employee.Employee.repository.UserRepository;
 
 @RestController
@@ -67,11 +66,12 @@ public class UserController {
 	 
 	 // Read User By ID
 	 @GetMapping("/user/{id}")
-	 public HashMap<String, Object> getById(@PathVariable(value = "id") UserId id){
+	 public HashMap<String, Object> getById(@PathVariable(value = "id") Integer id){
 		HashMap<String, Object> showHashMap = new HashMap<String, Object>();
+//		User user = userRepository.findById(id).orElse(null);
 		User user = new User();
 		for(User usr: userRepository.findAll()) {
-			if(usr.getId() == id) {
+			if(usr.getidUser() == id) {
 				user = usr;
 			}
 		}
@@ -90,24 +90,24 @@ public class UserController {
     	User user = new User();
     	String message;
     	
-//    	for(UserDTO e : listUsers) {
-//    		int number = 1;
-//    		boolean isAlreadyIn = false;
-//    		for(User d : userRepository.findAll()) {
-//    			if(e.getUsername().equalsIgnoreCase(d.getUsername())) {
-//    				isAlreadyIn = true;
-//    				break;
-//    			}
-//    		}
-//    		if(isAlreadyIn) {
-//    			showHashMap.put(number+". Create Failed on", e.getUsername());
-//    		}else {
-//    			showHashMap.put(number+". Create Success on", e.getUsername());
-//    			user = convertToEntity(e);
-//        		userRepository.save(user);
-//    		}
-//    		number++;
-//    	}
+    	for(UserDTO e : listUsers) {
+    		int number = 1;
+    		boolean isAlreadyIn = false;
+    		for(User d : userRepository.findAll()) {
+    			if(e.getUsername().equalsIgnoreCase(d.getUsername())) {
+    				isAlreadyIn = true;
+    				break;
+    			}
+    		}
+    		if(isAlreadyIn) {
+    			showHashMap.put(number+". Create Failed on", e.getUsername());
+    		}else {
+    			showHashMap.put(number+". Create Success on", e.getUsername());
+    			user = convertToEntity(e);
+        		userRepository.save(user);
+    		}
+    		number++;
+    	}
     
     	if(listUsers == null) {
     		message = "Create Failed!";
@@ -124,7 +124,7 @@ public class UserController {
 	
 	// Update a User
     @PutMapping("/user/update/{id}")
-    public HashMap<String, Object> updateUser(@PathVariable(value = "id") UserId id,
+    public HashMap<String, Object> updateUser(@PathVariable(value = "id") Integer id,
             @Valid @RequestBody UserDTO userDetails) {
     	
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
@@ -132,13 +132,17 @@ public class UserController {
     	
     	User user = new User();
 		for(User usr: userRepository.findAll()) {
-			if(usr.getId() == id) {
+			if(usr.getidUser() == id) {
 				user = usr;
+//				userRepository.delete(usr);
 			}
 		}
     	
     	UserDTO tempDTO = convertToDTO(user);
-    	userDetails.setid(tempDTO.getid());
+    	userDetails.setIdUser(tempDTO.getIdUser());
+    	if(userDetails.getUsername() == null) {
+    		userDetails.setUsername(tempDTO.getUsername());
+    	}
     	if(userDetails.getPassword() == null) {
     		userDetails.setPassword(tempDTO.getPassword());
     	}
@@ -146,6 +150,7 @@ public class UserController {
     		userDetails.setStatus(tempDTO.getStatus());
     	}
     	user = convertToEntity(userDetails);
+//    	userRepository.deleteById(id);
     	userRepository.save(user);
     	if(user == null) {
     		message = "Update Failed!";
@@ -161,11 +166,11 @@ public class UserController {
     
     // Delete a User
     @DeleteMapping("/user/delete/{id}")
-    public HashMap<String, Object> delete(@PathVariable(value = "id") UserId id) {
+    public HashMap<String, Object> delete(@PathVariable(value = "id") Integer id) {
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
     	User user = new User();
 		for(User usr: userRepository.findAll()) {
-			if(usr.getId() == id) {
+			if(usr.getidUser() == id) {
 				user = usr;
 			}
 		}
