@@ -113,7 +113,7 @@ public class KaryawanController {
     		
     	}
     
-    	if(listKaryawans.isEmpty() || !resultError.isEmpty() || resultSuccess.isEmpty()) {
+    	if(listKaryawans.isEmpty() || resultSuccess.isEmpty()) {
     		message = "Create Failed!";
     	} else {
     		message = "Create Success!";
