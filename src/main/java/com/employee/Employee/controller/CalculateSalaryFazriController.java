@@ -379,7 +379,7 @@ public class CalculateSalaryFazriController {
 			tunjanganPegawai = getTunjanganPegawai(karyawanDto);
 			tunjanganTransportasi = getTunjanganTransportation(karyawanDto, tanggalGaji);
 			bpjs = calculatePotonganBPJS(gajiPokok, tanggalGaji);
-			pph = calculatePph((gajiPokok + tunjanganKeluarga + tunjanganTransportasi + tunjanganPegawai));
+			pph = calculatePph(gajiPokok);
 			gajiKotor = calculateGajiKotor(gajiPokok, tunjanganKeluarga, tunjanganTransportasi, tunjanganPegawai);
 			gajiBersih = calculateGajiBersih(gajiKotor, bpjs, pph);
 			uangLembur = calculateUangLembur(gajiPokok);
