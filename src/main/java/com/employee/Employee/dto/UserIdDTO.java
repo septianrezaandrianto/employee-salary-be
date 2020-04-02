@@ -5,19 +5,19 @@ import java.io.Serializable;
 public class UserIdDTO implements Serializable{
 
 	private static final long serialVersionUID = 1L;
-	private int idUser;
+	private Integer idUser;
 	private String username;
 	 
 	public UserIdDTO() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public UserIdDTO(int idUser, String username) {
+	public UserIdDTO(Integer idUser, String username) {
 		super();
 		this.idUser = idUser;
 		this.username = username;
 	}
-	public int getIdUser() {
+	public Integer getIdUser() {
 		return idUser;
 	}
 	public String getUsername() {
