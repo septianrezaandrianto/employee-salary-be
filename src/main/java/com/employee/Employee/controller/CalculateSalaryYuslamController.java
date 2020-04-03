@@ -158,12 +158,12 @@ public class CalculateSalaryYuslamController {
 		 return totalTakeHomePay;
 	}
 	
-	@PostMapping("/insert")
-	public HashMap<String, Object> createPendapatan(@RequestParam (value="date") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate date){
-		HashMap<String, Object> hmPendapatan = new HashMap<String, Object>();		
-		for(Pendapatan pendapatan : pendapatanRepository.findAll()) {
-			
-		}
-	}
+//	@PostMapping("/insert")
+//	public HashMap<String, Object> createPendapatan(@RequestParam (value="date") @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate date){
+//		HashMap<String, Object> hmPendapatan = new HashMap<String, Object>();		
+//		for(Pendapatan pendapatan : pendapatanRepository.findAll()) {
+//			
+//		}
+//	}
 	
 }
