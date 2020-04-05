@@ -19,12 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.employee.Employee.dto.KaryawanDTO;
 import com.employee.Employee.model.Karyawan;
+import com.employee.Employee.model.LemburBonus;
 import com.employee.Employee.model.Parameter;
 import com.employee.Employee.model.Pendapatan;
 import com.employee.Employee.model.Penempatan;
 import com.employee.Employee.model.PresentaseGaji;
 import com.employee.Employee.model.TunjanganPegawai;
 import com.employee.Employee.repository.KaryawanRepository;
+import com.employee.Employee.repository.LemburBonusRepository;
 import com.employee.Employee.repository.ParameterRepository;
 import com.employee.Employee.repository.PendapatanRepository;
 import com.employee.Employee.repository.PenempatanRepository;
@@ -37,7 +39,6 @@ import com.employee.Employee.repository.TunjanganPegawaiRepository;
 @RequestMapping("/api")
 public class CalculateSalaryFazriController {
 	 ModelMapper modelMapper = new ModelMapper();
-	
 	 
 	 @Autowired
 	 KaryawanRepository karyawanRepository;
@@ -62,6 +63,9 @@ public class CalculateSalaryFazriController {
 	 
 	 @Autowired
 	 TunjanganPegawaiRepository tunjanganPegawaiRepository;
+	 
+	 @Autowired
+	 LemburBonusRepository lemburBonusRepository;
 	
 	 public KaryawanDTO convertToDTO(Karyawan karyawan) {
         return modelMapper.map(karyawan, KaryawanDTO.class);
@@ -72,193 +76,40 @@ public class CalculateSalaryFazriController {
      }
      
 	 // mencari UMK
-	 public double getUmk(KaryawanDTO karyawanDto) {
-		 double umk = 0;
+	 public BigDecimal getUmk(KaryawanDTO karyawanDto) {
+		 BigDecimal umk = new BigDecimal(0);
 		 for(Penempatan p : penempatanRepository.findAll()) {
 			 if(karyawanDto.getPenempatan().getIdPenempatan() == p.getIdPenempatan()) {
-				 umk = p.getUmkPenempatan().doubleValue();
+				 umk = p.getUmkPenempatan();
 			 }
 		 }
 		 
 		 return umk;
 	 }
 	 
-	 // Menghitung persentase gaji Programmer
-	 public double calculatePersentaseGajiProgrammer(KaryawanDTO karyawanDto) {
-		 double persentaseGaji = 0;
-		 for(PresentaseGaji pg : presentaseGajiRepository.findAll()) {
-			 if(karyawanDto.getPosisi().getIdPosisi() == pg.getPosisi().getIdPosisi() && karyawanDto.getPosisi().getNamaPosisi().contentEquals("Programmer")) {
-				 if(karyawanDto.getTingkatan().getIdTingkatan() == pg.getIdTingkatan()) {
-					 if(karyawanDto.getTingkatan().getNamaTingkatan().equalsIgnoreCase("Junior")) {
-						 if(karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 1) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 3) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() || karyawanDto.getMasaKerja() > 3){
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							}
-					 } else if (karyawanDto.getTingkatan().getNamaTingkatan().equalsIgnoreCase("Middle")) {
-						 if(karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 2) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 4) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() || karyawanDto.getMasaKerja() > 4){
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							}
-					 } else {
-						 if(karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 2) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 4) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() || karyawanDto.getMasaKerja() > 4){
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							}
-					 } 
-				 }
-			 }
-			
-		 }
-		 return persentaseGaji;
-	 }
-	
-	 // Menghitung persentase gaji Analist
-	 public double calculatePersentaseGajiAnalist(KaryawanDTO karyawanDto) {
-		 double persentaseGaji = 0;
-		 for(PresentaseGaji pg : presentaseGajiRepository.findAll()) {
-			 if(karyawanDto.getPosisi().getIdPosisi() == pg.getPosisi().getIdPosisi() && karyawanDto.getPosisi().getNamaPosisi().contentEquals("Analist")) {
-				 if(karyawanDto.getTingkatan().getIdTingkatan() == pg.getIdTingkatan()) {
-					 if(karyawanDto.getTingkatan().getNamaTingkatan().equalsIgnoreCase("Junior")) {
-						 if(karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 1) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 3) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() || karyawanDto.getMasaKerja() > 3){
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							}
-					 } else if (karyawanDto.getTingkatan().getNamaTingkatan().equalsIgnoreCase("Middle")) {
-						 if(karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 2) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 4) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() || karyawanDto.getMasaKerja() > 4){
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							}
-					 } else {
-						 if(karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 2) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 4) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() || karyawanDto.getMasaKerja() > 4){
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							}
-					 } 
-				 }
-			 }
-			
-		 }
-		 return persentaseGaji;
-	 }
-	 
-	 // Menghitung persentase gaji Tester
-	 public double calculatePersentaseGajiTester(KaryawanDTO karyawanDto) {
-		 double persentaseGaji = 0;
-		 for(PresentaseGaji pg : presentaseGajiRepository.findAll()) {
-			 if(karyawanDto.getPosisi().getIdPosisi() == pg.getPosisi().getIdPosisi() && karyawanDto.getPosisi().getNamaPosisi().contentEquals("Tester")) {
-				 if(karyawanDto.getTingkatan().getIdTingkatan() == pg.getIdTingkatan()) {
-					 if(karyawanDto.getTingkatan().getNamaTingkatan().equalsIgnoreCase("Junior")) {
-						 if(karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 1) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 3) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() || karyawanDto.getMasaKerja() > 3){
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							}
-					 } else if (karyawanDto.getTingkatan().getNamaTingkatan().equalsIgnoreCase("Middle")) {
-						 if(karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 2) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 4) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() || karyawanDto.getMasaKerja() > 4){
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							}
-					 } else {
-						 if(karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 2) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 4) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() || karyawanDto.getMasaKerja() > 4){
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							}
-					 } 
-				 }
-			 }
-			
-		 }
-		 return persentaseGaji;
-	 }
-	 
-	 // Menghitung persentase gaji Technical Writter
-	 public double calculatePersentaseGajiTechnicalWriter(KaryawanDTO karyawanDto) {
-		 double persentaseGaji = 0;
-		 for(PresentaseGaji pg : presentaseGajiRepository.findAll()) {
-			 if(karyawanDto.getPosisi().getIdPosisi() == pg.getPosisi().getIdPosisi() && karyawanDto.getPosisi().getNamaPosisi().contentEquals("Technical Writter")) {
-				 if(karyawanDto.getTingkatan().getIdTingkatan() == pg.getIdTingkatan()) {
-					 if(karyawanDto.getTingkatan().getNamaTingkatan().equalsIgnoreCase("Junior")) {
-						 if(karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 1) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 3) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() > 3){
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							}
-					 } else if (karyawanDto.getTingkatan().getNamaTingkatan().equalsIgnoreCase("Middle")) {
-						 if(karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 2) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 4) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() > 4){
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							}
-					 } else {
-						 if(karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 2) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() <= 4) {
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							} else if (karyawanDto.getMasaKerja() == pg.getMasaKerja() && karyawanDto.getMasaKerja() > 4){
-								persentaseGaji = pg.getBesaranGaji().doubleValue();
-							}
-					 } 
-				 }
-			 }
-			
-		 }
-		 return persentaseGaji;
-	 }
-	 
 	 // Menghitung presentasi gaji sesuai dengan posisi dan tingkatan
-	 public double calculatePersentaseGaji(KaryawanDTO karyawanDto) {
-		 double persentaseGaji = 0;
-		 
-		 if(karyawanDto.getPosisi().getNamaPosisi().equalsIgnoreCase("Programmer")) {
-			 persentaseGaji = calculatePersentaseGajiProgrammer(karyawanDto);
-		 } else if (karyawanDto.getPosisi().getNamaPosisi().equalsIgnoreCase("Analist")) {
-			 persentaseGaji = calculatePersentaseGajiAnalist(karyawanDto);
-		 } else if (karyawanDto.getPosisi().getNamaPosisi().equalsIgnoreCase("Tester")) {
-			 persentaseGaji = calculatePersentaseGajiTester(karyawanDto);
-		 } else {
-			 persentaseGaji = calculatePersentaseGajiTechnicalWriter(karyawanDto);
-		 }
+	 public BigDecimal calculatePersentaseGaji(KaryawanDTO karyawanDto) {
+		 BigDecimal persentaseGaji = new BigDecimal(0);
+		 for(PresentaseGaji pg: presentaseGajiRepository.findAll()) {
+				if(karyawanDto.getPosisi().getIdPosisi() == pg.getPosisi().getIdPosisi()) {
+					if(karyawanDto.getTingkatan().getIdTingkatan() == pg.getIdTingkatan()) {
+						if(karyawanDto.getMasaKerja() >= pg.getMasaKerja()) {
+							persentaseGaji = pg.getBesaranGaji();					
+						}
+					}			
+				}
+			}
 		 
 		 return persentaseGaji;
 	 }
 	 
 	 // mencari tunjangan pegawai berdasarkan posisi dan tingkatan
-	 public double getTunjanganPegawai(KaryawanDTO karyawanDto) {
-		 double tunjanganPegawai = 0;
+	 public BigDecimal getTunjanganPegawai(KaryawanDTO karyawanDto) {
+		 BigDecimal tunjanganPegawai = new BigDecimal(0);
 		 for(TunjanganPegawai tp : tunjanganPegawaiRepository.findAll()) {
 			 if(tp.getPosisi().getIdPosisi() == karyawanDto.getPosisi().getIdPosisi()) {
 				 if(tp.getTingkatan().getIdTingkatan() == karyawanDto.getTingkatan().getIdTingkatan()) {
-					 tunjanganPegawai = tp.getBesaranTujnaganPegawai().doubleValue();
+					 tunjanganPegawai = tp.getBesaranTujnaganPegawai();
 				 }
 			 }
 		 }
@@ -267,12 +118,12 @@ public class CalculateSalaryFazriController {
 
 	 // mencari tunjangan transportasi
 	 @SuppressWarnings("deprecation")
-	public double getTunjanganTransportation(KaryawanDTO karyawanDto, Date tanggalGaji) {
-		 double tunjanganTransportation = 0;
+	public BigDecimal getTunjanganTransportation(KaryawanDTO karyawanDto, Date tanggalGaji) {
+		 BigDecimal tunjanganTransportation = new BigDecimal(0);
 		 if(karyawanDto.getPenempatan().getKotaPenempatan().equalsIgnoreCase("DKI Jakarta")) {
 			 for(Parameter pr : parameterRepository.findAll()) {
 				 if(pr.getTbParameter().getMonth() == tanggalGaji.getMonth() && pr.getTbParameter().getYear() == tanggalGaji.getYear()) {
-					 tunjanganTransportation = pr.getTTransport().doubleValue();
+					 tunjanganTransportation = pr.getTTransport();
 				 }
 			 }
 		 }
@@ -281,12 +132,12 @@ public class CalculateSalaryFazriController {
 	 
 	 // Mencari Tunjangan Keluarga
 	 @SuppressWarnings("deprecation")
-	public double getTunjanganKeluarga(KaryawanDTO karyawanDto, double gajiPokok, Date tanggalGaji) {
-		 double tunjanganKeluarga = 0;
+	public BigDecimal getTunjanganKeluarga(KaryawanDTO karyawanDto, BigDecimal gajiPokok, Date tanggalGaji) {
+		 BigDecimal tunjanganKeluarga = new BigDecimal(0);
 		 for(Parameter p : parameterRepository.findAll()) {
 			 if(p.getTbParameter().getMonth() == tanggalGaji.getMonth() && p.getTbParameter().getYear() == tanggalGaji.getYear()) {
 				 if(karyawanDto.getStatusPernikahan() == 1) {
-					 tunjanganKeluarga = gajiPokok * p.getTKeluarga().doubleValue();
+					 tunjanganKeluarga = gajiPokok.multiply(p.getTKeluarga()) ;
 				 }
 			 }
 		 }
@@ -294,112 +145,152 @@ public class CalculateSalaryFazriController {
 	 }
 	 
 	 // Menghitung gaji pokok
-	 public double calculateGajiPokok(KaryawanDTO karyawanDto) {
-		 double gajiPokok = 0;
-		 double umk = getUmk(karyawanDto);
-		 gajiPokok = umk * calculatePersentaseGaji(karyawanDto);
+	 public BigDecimal calculateGajiPokok(KaryawanDTO karyawanDto) {
+		 BigDecimal gajiPokok = new BigDecimal(0);
+		 BigDecimal umk = getUmk(karyawanDto);
+		 gajiPokok = umk.multiply(calculatePersentaseGaji(karyawanDto));
 		 return gajiPokok;
 	 }
 	 
 	 // Menghitung potongan BPJS
 	 @SuppressWarnings("deprecation")
-	public double calculatePotonganBPJS(double gajiPokok, Date tanggalGaji) {
-		 double bpjs = 0;
+	public BigDecimal calculatePotonganBPJS(BigDecimal gajiPokok, Date tanggalGaji) {
+		 BigDecimal bpjs = new BigDecimal(0);
 		 for(Parameter p : parameterRepository.findAll()) {
 			 if(p.getTbParameter().getMonth() == tanggalGaji.getMonth() && p.getTbParameter().getYear() == tanggalGaji.getYear()) {
-				 bpjs = gajiPokok * p.getPBpjs().doubleValue();
+				 bpjs = gajiPokok.multiply(p.getPBpjs());
 			 }
 		 }
 		 return bpjs;
 	 }
 	 
 	 // Menghitung pph perbulan
-	 public double calculatePph(double gajiKotor) {
-		 double pph = 0;
-		 double persentasePph = 0.05;
-		 pph = (gajiKotor * persentasePph);
+	 public BigDecimal calculatePph(BigDecimal gajiKotor) {
+		 BigDecimal pph = new BigDecimal(0);
+		 BigDecimal persentasePph =new BigDecimal(0.05);
+		 pph = (gajiKotor.multiply(persentasePph));
 		 return pph;
 	 }
 	 
 	 // Menghitung Gaji Kotor
-	 public double calculateGajiKotor(double gajiPokok, double tunjanganKeluarga, double tunjanganTransportasi, double tunjanganPegawai) {
-		 double gajiKotor = 0;
-		 gajiKotor = gajiPokok + tunjanganKeluarga + tunjanganTransportasi + tunjanganPegawai;
+	 public BigDecimal calculateGajiKotor(BigDecimal gajiPokok, BigDecimal tunjanganKeluarga, BigDecimal tunjanganTransportasi, BigDecimal tunjanganPegawai) {
+		 BigDecimal gajiKotor = new BigDecimal(0);
+		 gajiKotor = (gajiPokok.add(tunjanganKeluarga).add(tunjanganTransportasi).add(tunjanganPegawai));
 		 return gajiKotor;
 	 }
 	 
 	 // Menghitung Gaji Bersih
-	 public double calculateGajiBersih(double gajiKotor, double bpjs, double pph) {
-		 double gajiBersih = 0;
-		 gajiBersih = (gajiKotor - bpjs - pph);
+	 public BigDecimal calculateGajiBersih(BigDecimal gajiKotor, BigDecimal bpjs, BigDecimal pph) {
+		 BigDecimal gajiBersih = new BigDecimal(0);
+		 gajiBersih = (gajiKotor.subtract(bpjs).subtract(pph));
 		 return gajiBersih;
 	 }
 	 
 	 // Menghitung Uang Lembur
-	 public double calculateUangLembur(double gajiPokok) {
-		 double uangLembur = 0;
-		 
+	 @SuppressWarnings("deprecation")
+	 public BigDecimal calculateUangLembur(KaryawanDTO karyawanDto, BigDecimal gajiKotor, Date tanggalGaji) {
+		 BigDecimal uangLembur = new BigDecimal(0);
+		 for(LemburBonus lb : lemburBonusRepository.findAll()) {
+			 if(karyawanDto.getIdKaryawan() == lb.getIdKaryawan()) {
+				 for(Parameter p : parameterRepository.findAll()) {
+					 if(p.getTbParameter().getMonth() == tanggalGaji.getMonth() && p.getTbParameter().getYear() == tanggalGaji.getYear()) {
+						 uangLembur = gajiKotor.multiply(p.getLembur()).multiply(BigDecimal.valueOf(lb.getLamaLembur()));
+					 }
+				 } 
+			 }
+		 }
 		 return uangLembur;
 	 }
 	 
 	 // Menghitung Uang Bonus
-	 public double calculateUangBonus(double gajiPokok) {
-		 double uangBonus = 0;
+	 @SuppressWarnings("deprecation")
+ 	 public BigDecimal calculateUangBonus(KaryawanDTO karyawanDto, BigDecimal gajiKotor, Date tanggalGaji) {
+		 BigDecimal uangBonus = new BigDecimal(0);
+		 for(LemburBonus lb : lemburBonusRepository.findAll()) {
+			 if(karyawanDto.getIdKaryawan() == lb.getIdKaryawan()) {
+				 for(Parameter p : parameterRepository.findAll()) {
+					 if(p.getTbParameter().getMonth() == tanggalGaji.getMonth() && p.getTbParameter().getYear() == tanggalGaji.getYear()) {
+						 if(karyawanDto.getPosisi().getNamaPosisi().equalsIgnoreCase("Programmer")) {
+							 uangBonus = (p.getBonusPg().multiply(BigDecimal.valueOf(lb.getVariableBonus()))).divide(BigDecimal.valueOf(p.getBatasanBonusPg()));
+							}
+							if(karyawanDto.getPosisi().getNamaPosisi().equalsIgnoreCase("Tester")) {
+								uangBonus = (p.getBonusTs().multiply(BigDecimal.valueOf(lb.getVariableBonus()))).divide(BigDecimal.valueOf(p.getBatasanBonusTs()));
+							}
+							if(karyawanDto.getPosisi().getNamaPosisi().equalsIgnoreCase("Technical Writter")) {
+								uangBonus = (p.getBonusTw().multiply(BigDecimal.valueOf(lb.getVariableBonus()))).divide(BigDecimal.valueOf(p.getBatasanBonusTw()));
+							}
+					 }
+				 } 
+			 }
+			 
+			 for(Parameter p : parameterRepository.findAll()) {
+				 if(p.getTbParameter().getMonth() == tanggalGaji.getMonth() && p.getTbParameter().getYear() == tanggalGaji.getYear()) {
+					if(uangBonus.doubleValue() > p.getMaxBonus().doubleValue()) {
+						uangBonus = p.getMaxBonus();
+					}
+				 }
+			 }
+		 }
+		 
 		 
 		 return uangBonus;
 	 }
 	 
 	 // Menghitung takeHomePay
-	 public double calculateTakeHomePay(double gajiBersih, double uangLembur, double uangBonus) {
-		 double takeHomePay = 0;
-		 takeHomePay = gajiBersih + uangLembur + uangBonus;
+	 public BigDecimal calculateTakeHomePay(BigDecimal gajiBersih, BigDecimal uangLembur, BigDecimal uangBonus) {
+		 BigDecimal takeHomePay = new BigDecimal(0);
+		 takeHomePay = (gajiBersih.add(uangLembur).add(uangBonus));
 		 return takeHomePay;
 	 }
 	 
 	 //Proses untuk inisialisasi object pendapatan
 	 public List<Pendapatan> initializationPendapatan(Date tanggalGaji) {
 		List<Pendapatan> listPendapatan = new ArrayList<Pendapatan>();
-		double gajiPokok = 0;
-    	double tunjanganKeluarga = 0;
-    	double tunjanganPegawai = 0;
-    	double tunjanganTransportasi = 0;
-    	double bpjs = 0;
-    	double pph = 0;
-    	double gajiKotor = 0;
-    	double gajiBersih = 0;
-    	double uangLembur = 0;
-    	double uangBonus = 0;
-    	double takeHomePay = 0;
-	    	
+		BigDecimal gajiPokok = new BigDecimal(0);
+    	BigDecimal tunjanganKeluarga = new BigDecimal(0);
+    	BigDecimal tunjanganPegawai = new BigDecimal(0);
+    	BigDecimal tunjanganTransportasi = new BigDecimal(0);
+    	BigDecimal bpjs = new BigDecimal(0);
+    	BigDecimal pph = new BigDecimal(0);
+    	BigDecimal gajiKotor = new BigDecimal(0);
+    	BigDecimal gajiBersih = new BigDecimal(0);
+    	BigDecimal uangLembur = new BigDecimal(0);
+    	BigDecimal uangBonus = new BigDecimal(0);
+    	BigDecimal takeHomePay = new BigDecimal(0);
+	    LemburBonus lemburBonus = new LemburBonus();
     	for(Karyawan k : karyawanRepository.findAll()) {
 			KaryawanDTO karyawanDto = convertToDTO(k);
-			
 			gajiPokok = calculateGajiPokok(karyawanDto);
 			tunjanganKeluarga = getTunjanganKeluarga(karyawanDto, gajiPokok, tanggalGaji);
 			tunjanganPegawai = getTunjanganPegawai(karyawanDto);
 			tunjanganTransportasi = getTunjanganTransportation(karyawanDto, tanggalGaji);
 			bpjs = calculatePotonganBPJS(gajiPokok, tanggalGaji);
-			pph = calculatePph(gajiPokok);
+			pph = calculatePph(gajiKotor);
 			gajiKotor = calculateGajiKotor(gajiPokok, tunjanganKeluarga, tunjanganTransportasi, tunjanganPegawai);
 			gajiBersih = calculateGajiBersih(gajiKotor, bpjs, pph);
-			uangLembur = calculateUangLembur(gajiPokok);
-			uangBonus = calculateUangBonus(gajiPokok);
+			uangLembur = calculateUangLembur(karyawanDto, gajiKotor, tanggalGaji);
+			uangBonus = calculateUangBonus(karyawanDto, gajiKotor, tanggalGaji);
 			takeHomePay = calculateTakeHomePay(gajiBersih, uangLembur, uangBonus);
 			
 			Pendapatan pendapatan = new Pendapatan();
+			if(lemburBonus.getIdKaryawan() == k.getIdKaryawan()) {
+				pendapatan.setLamaLembur(lemburBonus.getLamaLembur());
+				pendapatan.setVariableBonus(lemburBonus.getVariableBonus());
+			}
 			pendapatan.setKaryawan(convertToEntity(karyawanDto));
 			pendapatan.setTanggalGaji(tanggalGaji);
-			pendapatan.setGajiPokok(BigDecimal.valueOf(gajiPokok));
-			pendapatan.setTunjanganKeluarga(BigDecimal.valueOf(tunjanganKeluarga));
-			pendapatan.setTunjanganPegawai(BigDecimal.valueOf(tunjanganPegawai));
-			pendapatan.setTunjanganTransport(BigDecimal.valueOf(tunjanganTransportasi));
-			pendapatan.setBpjs(BigDecimal.valueOf(bpjs));
-			pendapatan.setPphPerbulan(BigDecimal.valueOf(pph));
-			pendapatan.setGajiKotor(BigDecimal.valueOf(gajiKotor));
-			pendapatan.setGajiBersih(BigDecimal.valueOf(gajiBersih));
-			pendapatan.setUangLembur(BigDecimal.valueOf(uangLembur));
-			pendapatan.setUangBonus(BigDecimal.valueOf(uangBonus));
-			pendapatan.setTakeHomePay(BigDecimal.valueOf(takeHomePay));
+			pendapatan.setGajiPokok(gajiPokok);
+			pendapatan.setTunjanganKeluarga(tunjanganKeluarga);
+			pendapatan.setTunjanganPegawai(tunjanganPegawai);
+			pendapatan.setTunjanganTransport(tunjanganTransportasi);
+			pendapatan.setBpjs(bpjs);
+			pendapatan.setPphPerbulan(pph);
+			pendapatan.setGajiKotor(gajiKotor);
+			pendapatan.setGajiBersih(gajiBersih);
+			pendapatan.setUangLembur(uangLembur);
+			
+			pendapatan.setUangBonus(uangBonus);
+			pendapatan.setTakeHomePay(takeHomePay);
 			
 			listPendapatan.add(pendapatan);
     	}
@@ -407,6 +298,7 @@ public class CalculateSalaryFazriController {
 		return listPendapatan;
 	 }
 	 
+	 // Proses Insert 
 	 //Menghitung Gaji semua karyawan
 	 @SuppressWarnings("deprecation")
 	 @PostMapping("/pendapatan/calculateSalary")
@@ -420,7 +312,7 @@ public class CalculateSalaryFazriController {
     	
     	if(listPendapatans.isEmpty()) {
     		for(Pendapatan p : initializationPendapatan(tanggalGaji)) {
-    			pendapatanRepository.save(p);
+//    			pendapatanRepository.save(p);
     			resutlList.add(p);	
     			message = "Create Success!";
     		}
@@ -440,13 +332,13 @@ public class CalculateSalaryFazriController {
 					p.setUangLembur(initializationPendapatan(tanggalGaji).get(index).getUangLembur());
 					p.setUangBonus(initializationPendapatan(tanggalGaji).get(index).getUangBonus());
 					p.setTakeHomePay(initializationPendapatan(tanggalGaji).get(index).getTakeHomePay());
-	    			pendapatanRepository.save(p);
+//	    			pendapatanRepository.save(p);
 	    			resutlList.add(p);	
 	    			message = "Update Success!";
 	    			index++;
     			} else {
     				for(Pendapatan temp : initializationPendapatan(tanggalGaji)) {
-    	    			pendapatanRepository.save(temp);
+//    	    			pendapatanRepository.save(temp);
     	    			resutlList.add(temp);	
     	    			message = "Create Success!";
     	    		}
