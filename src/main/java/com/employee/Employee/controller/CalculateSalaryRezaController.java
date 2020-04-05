@@ -2,7 +2,8 @@ package com.employee.Employee.controller;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Formatter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import javax.validation.Valid;
@@ -10,29 +11,31 @@ import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.employee.Employee.dto.KaryawanDTO;
 import com.employee.Employee.dto.ParameterDTO;
+import com.employee.Employee.dto.PendapatanDTO;
 import com.employee.Employee.dto.PenempatanDTO;
 import com.employee.Employee.dto.PresentaseGajiDTO;
 import com.employee.Employee.dto.TunjanganPegawaiDTO;
 import com.employee.Employee.model.Karyawan;
+import com.employee.Employee.model.LemburBonus;
 import com.employee.Employee.model.Parameter;
+import com.employee.Employee.model.Pendapatan;
 import com.employee.Employee.model.Penempatan;
 import com.employee.Employee.model.PresentaseGaji;
 import com.employee.Employee.model.TunjanganPegawai;
 import com.employee.Employee.repository.KaryawanRepository;
+import com.employee.Employee.repository.LemburBonusRepository;
 import com.employee.Employee.repository.ParameterRepository;
 import com.employee.Employee.repository.PendapatanRepository;
 import com.employee.Employee.repository.PenempatanRepository;
+import com.employee.Employee.repository.PosisiRepository;
 import com.employee.Employee.repository.PresentaseGajiRepository;
 import com.employee.Employee.repository.TunjanganPegawaiRepository;
 
@@ -52,9 +55,22 @@ public class CalculateSalaryRezaController {
 	private KaryawanRepository karyawanRepository;
 	@Autowired
 	private TunjanganPegawaiRepository tunjanganPegawaiRepository;
+	@Autowired
+	private LemburBonusRepository lemburBonusRepository;
 		
 	ModelMapper modelMapper = new ModelMapper();
 
+//	Convert Entity To DTO
+	public PendapatanDTO convertPendapatanEntityToDTO (Pendapatan pendapatan) {
+		PendapatanDTO pendapatanDTO = modelMapper.map(pendapatan, PendapatanDTO.class);
+	return pendapatanDTO;
+	}
+	
+//	Convert DTO to Entity
+	public Pendapatan convertPendapatanDTOToEntity (PendapatanDTO pendapatanDTO) {
+		Pendapatan pendapatan = modelMapper.map(pendapatanDTO, Pendapatan.class);
+	return pendapatan;
+	}
 	
 	@GetMapping("/cal/presentasegaji/{id}")
 	public BigDecimal getCalculateRates(@PathVariable(value="id") Integer idKaryawan) {
@@ -223,40 +239,175 @@ public class CalculateSalaryRezaController {
 	return bd;
 	}
 	
-//	Calculate take home pay
-	@GetMapping("cal/takehomepay/{id}")
-	public BigDecimal getCalculateTakeHomePay(@PathVariable(value="id") Integer idKaryawan) {
+//	Calculate Rates Lembur
+	@GetMapping("/cal/rateslembur/{id}")
+	public BigDecimal getCalculateLemburRates(@PathVariable(value = "id") Integer idLemburBonus) {
+		
 		double temp=0;
 		BigDecimal bd = BigDecimal.valueOf(temp);
-		double lmbr=0;
-		BigDecimal lembur = BigDecimal.valueOf(lmbr);
-		double bns=0;
-		BigDecimal bonus = BigDecimal.valueOf(bns);
 		
-		for (Karyawan kar : karyawanRepository.findAll()) {
-			
-			if (kar.getIdKaryawan() == idKaryawan) {
-				bd = getCalculateGajiBersih(idKaryawan).add(lembur).add(bonus);
+		for (LemburBonus lb :lemburBonusRepository.findAll()) {
+			for (Parameter param: parameterRepository.findAll()) {
+				
+				int lama = lb.getLamaLembur();
+				BigDecimal lamaLembur = BigDecimal.valueOf(lama) ;					
+				
+				if (lb.getIdLemburBonus() == idLemburBonus) {						
+					bd = lamaLembur.multiply(param.getLembur());
+				}
+			} 		
+		}
+		
+	return bd;
+	}
+	
+//	Calculate Uang Lembur
+	@GetMapping("/cal/uanglembur/{id}")
+	public BigDecimal getCalculateUangLembur(@PathVariable(value = "id") Integer idKaryawan) {
+		
+		double temp = 0;
+		BigDecimal bd = BigDecimal.valueOf(temp);
+		
+		for (LemburBonus lb : lemburBonusRepository.findAll()) {
+			for (Karyawan kar : karyawanRepository.findAll()) {
+											 
+				if (lb.getIdLemburBonus() == idKaryawan && lb.getIdKaryawan() == kar.getIdKaryawan()) {					
+					bd = getCalculateLemburRates(idKaryawan).multiply((getCalculateGajiKotor(kar.getIdKaryawan())));
+				}
 			}
 		}
 	return bd;
 	}
 	
+//	Menentukan ketentuan bonus Tester
+	@GetMapping("/cal/ketentuanbatasanbonustester/{id}")
+	public BigDecimal getKetentuanBatasanBonusTester (@PathVariable(value = "id") Long idLemburBonus) {
+		double temp=0;
+		BigDecimal bd = BigDecimal.valueOf(temp);
+		double result = 0;
+		BigDecimal br = BigDecimal.valueOf(result);
+	
+		for (Karyawan kar : karyawanRepository.findAll()) {
+			for (LemburBonus lb : lemburBonusRepository.findAll()) {
+				for ( Parameter param : parameterRepository.findAll()) {
+
+				if ( lb.getIdLemburBonus() == idLemburBonus && kar.getIdKaryawan() == lb.getIdKaryawan() && kar.getPosisi().getIdPosisi() == 3) {
+						bd = BigDecimal.valueOf(lb.getVariableBonus()/100 * 100);						
+							br = bd.multiply(param.getBonusTs().divide(BigDecimal.valueOf(param.getBatasanBonusTs())));					
+					}
+				}			
+			}
+		}
+	return br;	
+	}
+	
+	
+//	Calculate Uang Bonus
+	@GetMapping("/cal/uangbonus/{id}")
+	public BigDecimal getCalculateUangBonus(@PathVariable(value = "id") Integer idKaryawan) {
+		
+		double temp = 0;
+		BigDecimal bd = BigDecimal.valueOf(temp);
+		
+		for (LemburBonus lb : lemburBonusRepository.findAll()) {
+			for (Parameter param : parameterRepository.findAll()) {
+				for (Karyawan kar : karyawanRepository.findAll()) {			
+					
+					if (idKaryawan == kar.getIdKaryawan()) {
+						if (kar.getIdKaryawan() == lb.getIdKaryawan()) {
+							if (kar.getPosisi().getIdPosisi() == 1 ) {
+								bd = BigDecimal.valueOf(lb.getVariableBonus()).multiply(param.getBonusPg());							
+							}
+						}							
+					}					
+					if (idKaryawan == kar.getIdKaryawan()) {
+						if (kar.getIdKaryawan() == lb.getIdKaryawan()) {
+							if (kar.getPosisi().getIdPosisi() == 3 ) {
+								bd = getKetentuanBatasanBonusTester(lb.getIdLemburBonus());							
+							}
+						}							
+					}					
+					if (idKaryawan == kar.getIdKaryawan()) {
+						if (kar.getIdKaryawan() == lb.getIdKaryawan()) {
+							if (kar.getPosisi().getIdPosisi() == 4 ) {
+								bd = BigDecimal.valueOf(lb.getVariableBonus()).multiply(param.getBonusTw());					
+							}
+						}							
+					}
+					
+				//	Menentukan maximal Bonus							
+					BigDecimal maxBonus = param.getMaxBonus();
+					if (bd.compareTo(maxBonus) == 1) {
+						bd = maxBonus;
+					}			
+				}				
+			}
+		}		
+	return bd;
+	}
+	
+	
+//	Calculate take home pay
+	@GetMapping("cal/takehomepay/{id}")
+	public BigDecimal getCalculateTakeHomePay(@PathVariable(value="id") Integer idKaryawan) {
+		double temp=0;
+		BigDecimal bd = BigDecimal.valueOf(temp);
+		
+		for (Karyawan kar : karyawanRepository.findAll()) {			
+				
+			if (kar.getIdKaryawan() == idKaryawan) {
+				
+				bd = getCalculateGajiBersih(idKaryawan).add(getCalculateUangLembur(idKaryawan).add(getCalculateUangBonus(idKaryawan)));
+			}			
+		}
+	return bd;
+	}
+	
+	
+	
 	
 //	Insert data into tabel pendapatan
-//	@GetMapping("/cal/add/")
-//	public HashMap<String, Object> insertIntoPendapatan(@RequestParam(value="date")
-//														@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate Date) {
-//		
-//
-//		HashMap<String, Object> hasMap = new HashMap<String, Object>();
-//		
-//		for (Karyawan kar : karyawanRepository.findAll()) {
-//			
-//		}
-//		
-//	return hasMap;
-//	}
+	@PostMapping("/calculatesalary/add/")
+	public HashMap<String, Object> insertIntoPendapatan(@RequestParam(value="date")
+														@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Valid LocalDate date) {		
+		Date salaryDate = java.sql.Date.valueOf(date);	
+		
+		HashMap<String, Object> hasMap = new HashMap<String, Object>();
+
+		ArrayList<PendapatanDTO> listPendapatanDto = new ArrayList<PendapatanDTO>();
+		
+		for (Karyawan kar : karyawanRepository.findAll()) {
+				
+			BigDecimal gajiPokok = getCalculateGapok(kar.getIdKaryawan());
+			BigDecimal tunjanganKeluarga = getCalculateTunjanganKeluarga(kar.getIdKaryawan());
+			BigDecimal tunjanganPegawai = (BigDecimal) getCalculateTunjanganPegawai().get(kar.getIdKaryawan());
+			BigDecimal tunjanganTransport = getCalculateBonusPenempatan(kar.getIdKaryawan());
+			BigDecimal gajiKotor = getCalculateGajiKotor(kar.getIdKaryawan());
+			BigDecimal pphPerbulan = getCalculatePPH(kar.getIdKaryawan());
+			BigDecimal bpjs = getCalculatePotonganBpjs(kar.getIdKaryawan());
+			BigDecimal gajiBersih = getCalculateGajiBersih(kar.getIdKaryawan());
+			BigDecimal uangLembur = getCalculateUangLembur(kar.getIdKaryawan());
+			BigDecimal uangBonus = getCalculateUangBonus(kar.getIdKaryawan());
+			BigDecimal takeHomePay = getCalculateTakeHomePay(kar.getIdKaryawan());
+					
+//				for (Pendapatan pen : pendapatanRepository.findAll()) {
+					for (LemburBonus lb : lemburBonusRepository.findAll()) {
+//					if ( pen.getKaryawan().getIdKaryawan() != kar.getIdKaryawan() && salaryDate.getMonth() != pen.getTanggalGaji().getMonth() && salaryDate.getYear() != pen.getTanggalGaji().getYear()) {
+						if (lb.getIdKaryawan() == kar.getIdKaryawan()) {		
+					Pendapatan pendapatan = new Pendapatan (0, kar , salaryDate, gajiPokok,tunjanganKeluarga,tunjanganPegawai,tunjanganTransport,gajiKotor,pphPerbulan,bpjs,gajiBersih, lb.getLamaLembur(), uangLembur, lb.getVariableBonus(), uangBonus, takeHomePay);
+					
+					pendapatanRepository.save(pendapatan);
+					
+					PendapatanDTO pendapatanDto = convertPendapatanEntityToDTO(pendapatan);
+					listPendapatanDto.add(pendapatanDto);	
+						
+					hasMap.put("Total", listPendapatanDto.size());
+					hasMap.put("Data", listPendapatanDto);
+				}		
+			}
+		}	
+	return hasMap;
+	}
 	
 	
 }
