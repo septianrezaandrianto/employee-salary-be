@@ -328,7 +328,9 @@ private static final String DateTimeFormat = null;
 		Karyawan karyawan = karyawanRepository.findById(id).orElse(null);
 		LemburBonus lemburBonus = getLemburBonus(id);
 		BigDecimal variableBonus = BigDecimal.valueOf(lemburBonus.getVariableBonus());
+		BigDecimal maxBonus = new BigDecimal(0);
 		for(Parameter p: parameterRepository.findAll()) {
+			maxBonus = p.getMaxBonus();
 			if(karyawan.getPosisi().getIdPosisi() == 1) {
 				result = (p.getBonusPg().multiply(variableBonus)).divide(BigDecimal.valueOf(p.getBatasanBonusPg()));
 			}
@@ -338,6 +340,9 @@ private static final String DateTimeFormat = null;
 			if(karyawan.getPosisi().getIdPosisi() == 4) {
 				result = (p.getBonusTw().multiply(variableBonus)).divide(BigDecimal.valueOf(p.getBatasanBonusTw()));
 			}
+		}
+		if(result.compareTo(maxBonus) > 1) {
+			result = maxBonus;
 		}
     	
     	return result;
