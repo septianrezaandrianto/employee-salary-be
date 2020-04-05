@@ -28,14 +28,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.employee.Employee.dto.KaryawanDTO;
+import com.employee.Employee.dto.LemburBonusDTO;
 import com.employee.Employee.dto.PendapatanDTO;
 import com.employee.Employee.model.Karyawan;
+import com.employee.Employee.model.LemburBonus;
 import com.employee.Employee.model.Parameter;
 import com.employee.Employee.model.Pendapatan;
 import com.employee.Employee.model.Penempatan;
 import com.employee.Employee.model.PresentaseGaji;
 import com.employee.Employee.model.TunjanganPegawai;
 import com.employee.Employee.repository.KaryawanRepository;
+import com.employee.Employee.repository.LemburBonusRepository;
 import com.employee.Employee.repository.ParameterRepository;
 import com.employee.Employee.repository.PendapatanRepository;
 import com.employee.Employee.repository.PenempatanRepository;
@@ -53,19 +56,6 @@ public class EmployeeSalaryRenoController {
 private static final String DateTimeFormat = null;
 //====================================MODEL MAPPER================================================================
 	ModelMapper modelMapper = new ModelMapper();
-	
-	public KaryawanDTO convertToDTO(List<Karyawan> listKaryawans) {
-		 KaryawanDTO karyawanDto = modelMapper.map(listKaryawans, KaryawanDTO.class);
-        return karyawanDto;
-	 }
-	 
-	 public KaryawanDTO convertToDTO(Karyawan karyawan) {
-	        return modelMapper.map(karyawan, KaryawanDTO.class);
-	    }
-
-    public Karyawan convertToEntity(KaryawanDTO karyawanDto) {
-       return modelMapper.map(karyawanDto, Karyawan.class);
-    }
 //====================================================================================================    
 	@Autowired
 	PosisiRepository posisiRepository;
@@ -83,15 +73,43 @@ private static final String DateTimeFormat = null;
 	PendapatanRepository pendapatanRepository;
 	@Autowired
 	TunjanganPegawaiRepository tunjanganPegawaiRepository;
-
+	@Autowired
+	LemburBonusRepository lemburBonusRepository;
+	
+	@GetMapping("/pendapatan/reno/all")
+	public HashMap<String, Object> getAllLemburBonus() {
+		HashMap<String, Object> showHashMap = new HashMap<String, Object>();
+		List<PendapatanDTO> listLemburBonus = new ArrayList<PendapatanDTO>();
+		for(Pendapatan a : pendapatanRepository.findAll()) {
+			PendapatanDTO lemburBonusDto = modelMapper.map(a, PendapatanDTO.class);
+			listLemburBonus.add(lemburBonusDto);
+		}
+		
+		String message;
+	    if(listLemburBonus.isEmpty()) {
+			message = "Read All Failed!";
+		} else {
+			message = "Read All Success!";
+		}
+		showHashMap.put("Message", message);
+		showHashMap.put("Total", listLemburBonus.size());
+		showHashMap.put("Data", listLemburBonus);
+		
+		return showHashMap;
+	}
+	
 	//ADD TO PENDAPATAN
-	@GetMapping("/test/lol")
+	@PostMapping("/pendapatan/reno/run")
 	@ResponseBody
 	public HashMap<String, Object> addToPendapatan(@RequestParam String date) throws ParseException{
 		Date dateGaji = new SimpleDateFormat("yyyy-MM-dd").parse(date);
 		HashMap<String, Object> process = new HashMap<String, Object>();
 		ArrayList<PendapatanDTO> listPendapatanDTO = new ArrayList<PendapatanDTO>();
-		ArrayList<Pendapatan> listPendapatan = (ArrayList<Pendapatan>) pendapatanRepository.findAll();
+//		ArrayList<Pendapatan> listPendapatan = (ArrayList<Pendapatan>) pendapatanRepository.findAll();
+		ArrayList<Pendapatan> listPendapatan = new ArrayList<Pendapatan>();
+		for(Pendapatan p : pendapatanRepository.findAll()) {
+			listPendapatan.add(p);
+		}
 		for(Karyawan k : karyawanRepository.findAll()) {
 				
 			KaryawanDTO kDTO = modelMapper.map(k, KaryawanDTO.class);
@@ -103,19 +121,33 @@ private static final String DateTimeFormat = null;
 			BigDecimal pph = getPPH(kDTO.getIdKaryawan());
 			BigDecimal bpjs = getBPJS(kDTO.getIdKaryawan());
 			BigDecimal gajiBersih = getGajiBersih(kDTO.getIdKaryawan());
+			LemburBonus lemburBonus = getLemburBonus(kDTO.getIdKaryawan());
+			BigDecimal uangLembur = getUangLembur(kDTO.getIdKaryawan());
+			BigDecimal uangBonus = getUangBonus(kDTO.getIdKaryawan());
+			BigDecimal takeHomePay = getTakeHomePay(kDTO.getIdKaryawan());
 			Pendapatan pendapatan = new Pendapatan();
 			if(!listPendapatan.isEmpty()) {
-				for(Pendapatan p: listPendapatan) {
-					if(k.getIdKaryawan() == p.getIdPendapatan() && p.getTanggalGaji().getMonth() == dateGaji.getMonth()) {
-						pendapatan = new Pendapatan(p.getIdPendapatan(), k, dateGaji, gajiPokok, tjKeluarga, tjPegawai, tjKhusus, gajiKotor, pph, bpjs, gajiBersih, 0, BigDecimal.valueOf(0), 0, BigDecimal.valueOf(0), gajiBersih);
-						pendapatanRepository.save(pendapatan);
+				boolean isExistKaryawan = isKaryawanExistInPendapatan(k.getIdKaryawan());
+				
+				if(!isExistKaryawan) {
+					pendapatan = new Pendapatan(0, k, dateGaji, gajiPokok, tjKeluarga, tjPegawai, tjKhusus, gajiKotor, pph, bpjs, gajiBersih, lemburBonus.getLamaLembur(), uangLembur, lemburBonus.getVariableBonus(), uangBonus, takeHomePay);
+					pendapatanRepository.save(pendapatan);
+				}else {
+					boolean isExistMonth = isMonthExistInPendapatan(dateGaji,listPendapatan);
+					if(isExistMonth) {
+						for(Pendapatan p: listPendapatan) {
+							if(k.getIdKaryawan() == p.getKaryawan().getIdKaryawan() && p.getTanggalGaji().getMonth() == dateGaji.getMonth()) {
+								pendapatan = new Pendapatan(p.getIdPendapatan(), k, dateGaji, gajiPokok, tjKeluarga, tjPegawai, tjKhusus, gajiKotor, pph, bpjs, gajiBersih, lemburBonus.getLamaLembur(), uangLembur, lemburBonus.getVariableBonus(), uangBonus, takeHomePay);
+								pendapatanRepository.save(pendapatan);
+							}				
+						}
 					}else {
-						pendapatan = new Pendapatan(0, k, dateGaji, gajiPokok, tjKeluarga, tjPegawai, tjKhusus, gajiKotor, pph, bpjs, gajiBersih, 0, BigDecimal.valueOf(0), 0, BigDecimal.valueOf(0), gajiBersih);
+						pendapatan = new Pendapatan(0, k, dateGaji, gajiPokok, tjKeluarga, tjPegawai, tjKhusus, gajiKotor, pph, bpjs, gajiBersih, lemburBonus.getLamaLembur(), uangLembur, lemburBonus.getVariableBonus(), uangBonus, takeHomePay);
 						pendapatanRepository.save(pendapatan);
 					}
 				}
 			}else {
-				pendapatan = new Pendapatan(0, k, dateGaji, gajiPokok, tjKeluarga, tjPegawai, tjKhusus, gajiKotor, pph, bpjs, gajiBersih, 0, BigDecimal.valueOf(0), 0, BigDecimal.valueOf(0), gajiBersih);
+				pendapatan = new Pendapatan(0, k, dateGaji, gajiPokok, tjKeluarga, tjPegawai, tjKhusus, gajiKotor, pph, bpjs, gajiBersih, lemburBonus.getLamaLembur(), uangLembur, lemburBonus.getVariableBonus(), uangBonus, takeHomePay);
 				pendapatanRepository.save(pendapatan);
 			}
 			PendapatanDTO pDTO = modelMapper.map(pendapatan, PendapatanDTO.class);
@@ -126,6 +158,26 @@ private static final String DateTimeFormat = null;
 //		process.put("Tanggal: ", dateGaji.getMonth());
 		process.put("DATA: ", listPendapatanDTO);
 		return process;
+	}
+	
+	//Validasi Karyawan di Pendapatan
+	public boolean isKaryawanExistInPendapatan(Integer idKaryawan) {
+		boolean isExists = false;
+		for(Pendapatan p:pendapatanRepository.findAll()) {
+			if(p.getKaryawan().getIdKaryawan() == idKaryawan) {
+				isExists = true;
+			}
+		}
+		return isExists;
+	}
+	public boolean isMonthExistInPendapatan(Date date, ArrayList<Pendapatan> listPendapatan) {
+		boolean isExists = false;
+		for(Pendapatan p: listPendapatan) {
+			if(p.getTanggalGaji().getMonth() == date.getMonth()) {
+				isExists = true;
+			}
+		}
+		return isExists;
 	}
 	
 	//PresentaseGaji
@@ -241,6 +293,69 @@ private static final String DateTimeFormat = null;
 		BigDecimal bpjs = (BigDecimal)getBPJS(id);
 		BigDecimal pph = (BigDecimal)getPPH(id);
 		result = totalPenghasilan.subtract(bpjs).subtract(pph);
+    	
+    	return result;
+    }
+    
+    //get LemburBonus By ID Karyawan
+    public LemburBonus getLemburBonus(Integer idKaryawan) {
+    	LemburBonus lemburBonus = new LemburBonus();
+    	for(LemburBonus lb: lemburBonusRepository.findAll()) {
+    		if(Long.valueOf(idKaryawan) == lb.getIdKaryawan()) {
+    			lemburBonus = lb;
+    		}
+    	}
+    	return lemburBonus;
+    }
+    
+    //get Uang Lembur
+    @GetMapping("/uanglembur/reno/{id}")
+    public BigDecimal getUangLembur(@PathVariable(value = "id")Integer id) {
+    	BigDecimal result = new BigDecimal(0);
+		BigDecimal totalPenghasilan = (BigDecimal)getTotalPenghasilan(id);
+		LemburBonus lemburBonus = getLemburBonus(id);
+		for(Parameter p: parameterRepository.findAll()) {
+			result = (totalPenghasilan.multiply(p.getLembur())).multiply(BigDecimal.valueOf(lemburBonus.getLamaLembur()));
+		}
+    	
+    	return result;
+    }
+    
+    //get Uang Bonus
+    @GetMapping("/uangbonus/reno/{id}")
+    public BigDecimal getUangBonus(@PathVariable(value = "id")Integer id) {
+    	BigDecimal result = new BigDecimal(0);
+		Karyawan karyawan = karyawanRepository.findById(id).orElse(null);
+		LemburBonus lemburBonus = getLemburBonus(id);
+		BigDecimal variableBonus = BigDecimal.valueOf(lemburBonus.getVariableBonus());
+		BigDecimal maxBonus = new BigDecimal(0);
+		for(Parameter p: parameterRepository.findAll()) {
+			maxBonus = p.getMaxBonus();
+			if(karyawan.getPosisi().getIdPosisi() == 1) {
+				result = (p.getBonusPg().multiply(variableBonus)).divide(BigDecimal.valueOf(p.getBatasanBonusPg()));
+			}
+			if(karyawan.getPosisi().getIdPosisi() == 3) {
+				result = (p.getBonusTs().multiply(variableBonus)).divide(BigDecimal.valueOf(p.getBatasanBonusTs()));
+			}
+			if(karyawan.getPosisi().getIdPosisi() == 4) {
+				result = (p.getBonusTw().multiply(variableBonus)).divide(BigDecimal.valueOf(p.getBatasanBonusTw()));
+			}
+		}
+		if(result.compareTo(maxBonus) > 1) {
+			result = maxBonus;
+		}
+    	
+    	return result;
+    }
+    
+    //TakeHomePay
+    @GetMapping("/takehomepay/reno/{id}")
+    public BigDecimal getTakeHomePay(@PathVariable(value = "id")Integer id) {
+    	BigDecimal result = new BigDecimal(0);
+		BigDecimal gajiBersih = (BigDecimal)getGajiBersih(id);
+		BigDecimal uangLembur = (BigDecimal)getUangLembur(id);
+		BigDecimal uangBonus = (BigDecimal)getUangBonus(id);
+		result = (gajiBersih.add(uangLembur)).add(uangBonus);
     	
     	return result;
     }
