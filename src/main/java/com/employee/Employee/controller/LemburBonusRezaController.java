@@ -104,32 +104,18 @@ public class LemburBonusRezaController {
 	
 	
 //	Menambah data lembur bonus
-	@PostMapping("/lemburbonus/add")
-	public HashMap<String, Object> addLemburBonus(@RequestParam(value="date")
-												  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Valid LocalDate date) {
-		
-		Date lemburBonusDate = java.sql.Date.valueOf(date);	
-		
-		HashMap<String, Object> hasMap = new HashMap<String, Object>();
-		ArrayList<LemburBonusDTO> listLemburBonusDto = new ArrayList<LemburBonusDTO>();
-		
-		for (LemburBonus lb : lemburBonusRepository.findAll()) {
-			for (Karyawan kar: karyawanRepository.findAll()) {
-						
-			//	if (lb.getIdKaryawan() != kar.getIdKaryawan() && lemburBonusDate.getDate() != lb.getTanggalLemburBonus().getDate()) {
-					LemburBonus lemburBonus = new LemburBonus(lb.getIdLemburBonus(), lb.getIdKaryawan(), lemburBonusDate, lb.getLamaLembur(), lb.getVariableBonus());
-					lemburBonusRepository.save(lemburBonus);
-					
-					LemburBonusDTO lemburBonusDto = convertEntityToDTO(lemburBonus);
-					listLemburBonusDto.add(lemburBonusDto);
-			//	}			
-			}
-		}
-		hasMap.put("Total", listLemburBonusDto.size());
-		hasMap.put("Data", listLemburBonusDto);
-		
-	return hasMap;	
-	}
+	 @PostMapping("/lemburbonus/add")
+	    public HashMap<String, Object> addlemburBonus(@Valid @RequestBody LemburBonusDTO lemburBonusDTO) {
+	       
+		 HashMap<String, Object> hasMap = new HashMap<String, Object>();
+
+	      LemburBonus lemburBonus = convertDTOToEntity(lemburBonusDTO);
+	      
+	      hasMap.put("Message", "Add Success");
+	      hasMap.put("Data", lemburBonusRepository.save(lemburBonus));
+
+	    return hasMap;
+	    }
 		
 	
 //	Mengupdate Lembur Bonus
