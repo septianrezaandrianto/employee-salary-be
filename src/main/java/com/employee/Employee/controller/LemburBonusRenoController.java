@@ -117,42 +117,71 @@ private static final String DateTimeFormat = null;
 		LemburBonusDTO lemburBonusDTO = new LemburBonusDTO();
 		List<LemburBonusDTO> listLemburBonusDTO = new ArrayList<LemburBonusDTO>();
 		ArrayList<LemburBonus> listLemburBonus = new ArrayList<LemburBonus>();
+		LemburBonus lemburBonus = new LemburBonus();
 		for(LemburBonus lb: lemburBonusRepository.findAll()) {
 			listLemburBonus.add(lb);
 		}
-		for(Karyawan k: karyawanRepository.findAll()) {
-			LemburBonus lemburBonus = new LemburBonus();
+		if(inputLemburBonus.getIdKaryawan() != null ||inputLemburBonus.getIdKaryawan() != 0) {
+			boolean isKaryawanExist = isKaryawanExistInLemburBonus(inputLemburBonus.getIdKaryawan());
 			
-			if(listLemburBonus.isEmpty()) {
-				lemburBonus = new LemburBonus(0, Long.valueOf(k.getIdKaryawan()), inputLemburBonus.getTanggalLemburBonus(), inputLemburBonus.getLamaLembur(), inputLemburBonus.getVariableBonus());
+			if(!isKaryawanExist) {
+				lemburBonus = new LemburBonus(0, Long.valueOf(inputLemburBonus.getIdKaryawan()), inputLemburBonus.getTanggalLemburBonus(), inputLemburBonus.getLamaLembur(), inputLemburBonus.getVariableBonus());
 				lemburBonusRepository.save(lemburBonus);
+				lemburBonusDTO = modelMapper.map(lemburBonus, LemburBonusDTO.class);
+				listLemburBonusDTO.add(lemburBonusDTO);
 			}else {
-				boolean isKaryawanExist = isKaryawanExistInLemburBonus(Long.valueOf(k.getIdKaryawan()));
-				
-				if(!isKaryawanExist && inputLemburBonus.getIdKaryawan() != null) {
-					lemburBonus = new LemburBonus(0, Long.valueOf(k.getIdKaryawan()), inputLemburBonus.getTanggalLemburBonus(), inputLemburBonus.getLamaLembur(), inputLemburBonus.getVariableBonus());
-					lemburBonusRepository.save(lemburBonus);
-					
-				}else {
-					boolean isMonthExist = isMonthExistInLemburBonus(inputLemburBonus.getTanggalLemburBonus(), listLemburBonus);
-					if(isMonthExist) {
-						for(LemburBonus lb: listLemburBonus) {
-							if(lb.getIdKaryawan() == k.getIdKaryawan() && lb.getTanggalLemburBonus().getMonth() == inputLemburBonus.getTanggalLemburBonus().getMonth()) {
-								lemburBonus = new LemburBonus(lb.getIdLemburBonus(), lb.getIdKaryawan(), inputLemburBonus.getTanggalLemburBonus(), inputLemburBonus.getLamaLembur(), inputLemburBonus.getVariableBonus());
-								lemburBonusRepository.save(lemburBonus);
-							}
-							
+				boolean isMonthExist = isMonthExistInLemburBonus(inputLemburBonus.getTanggalLemburBonus(), listLemburBonus);
+				if(isMonthExist) {
+					for(LemburBonus lb: listLemburBonus) {
+						if(lb.getIdKaryawan() == inputLemburBonus.getIdKaryawan() && lb.getTanggalLemburBonus().getMonth() == inputLemburBonus.getTanggalLemburBonus().getMonth()) {
+							lemburBonus = new LemburBonus(lb.getIdLemburBonus(), lb.getIdKaryawan(), inputLemburBonus.getTanggalLemburBonus(), inputLemburBonus.getLamaLembur(), inputLemburBonus.getVariableBonus());
+							lemburBonusRepository.save(lemburBonus);
+							lemburBonusDTO = modelMapper.map(lemburBonus, LemburBonusDTO.class);
+							listLemburBonusDTO.add(lemburBonusDTO);
 						}
-					}else {
-						lemburBonus = new LemburBonus(0, Long.valueOf(k.getIdKaryawan()), inputLemburBonus.getTanggalLemburBonus(), inputLemburBonus.getLamaLembur(), inputLemburBonus.getVariableBonus());
-						lemburBonusRepository.save(lemburBonus);
-					}
 						
+					}
+				}else {
+					lemburBonus = new LemburBonus(0, inputLemburBonus.getIdKaryawan(), inputLemburBonus.getTanggalLemburBonus(), inputLemburBonus.getLamaLembur(), inputLemburBonus.getVariableBonus());
+					lemburBonusRepository.save(lemburBonus);
 				}
 			}
-			lemburBonusDTO = modelMapper.map(lemburBonus, LemburBonusDTO.class);
-			listLemburBonusDTO.add(lemburBonusDTO);
+		}else {
+			for(Karyawan k: karyawanRepository.findAll()) {
+				
+				
+				if(listLemburBonus.isEmpty()) {
+					lemburBonus = new LemburBonus(0, Long.valueOf(k.getIdKaryawan()), inputLemburBonus.getTanggalLemburBonus(), inputLemburBonus.getLamaLembur(), inputLemburBonus.getVariableBonus());
+					lemburBonusRepository.save(lemburBonus);
+				}else {
+					boolean isKaryawanExist = isKaryawanExistInLemburBonus(Long.valueOf(k.getIdKaryawan()));
+					
+					if(!isKaryawanExist) {
+						lemburBonus = new LemburBonus(0, Long.valueOf(k.getIdKaryawan()), inputLemburBonus.getTanggalLemburBonus(), inputLemburBonus.getLamaLembur(), inputLemburBonus.getVariableBonus());
+						lemburBonusRepository.save(lemburBonus);
+						
+					}else {
+						boolean isMonthExist = isMonthExistInLemburBonus(inputLemburBonus.getTanggalLemburBonus(), listLemburBonus);
+						if(isMonthExist) {
+							for(LemburBonus lb: listLemburBonus) {
+								if(lb.getIdKaryawan() == k.getIdKaryawan() && lb.getTanggalLemburBonus().getMonth() == inputLemburBonus.getTanggalLemburBonus().getMonth()) {
+									lemburBonus = new LemburBonus(lb.getIdLemburBonus(), lb.getIdKaryawan(), inputLemburBonus.getTanggalLemburBonus(), inputLemburBonus.getLamaLembur(), inputLemburBonus.getVariableBonus());
+									lemburBonusRepository.save(lemburBonus);
+								}
+								
+							}
+						}else {
+							lemburBonus = new LemburBonus(0, Long.valueOf(k.getIdKaryawan()), inputLemburBonus.getTanggalLemburBonus(), inputLemburBonus.getLamaLembur(), inputLemburBonus.getVariableBonus());
+							lemburBonusRepository.save(lemburBonus);
+						}
+							
+					}
+				}
+				lemburBonusDTO = modelMapper.map(lemburBonus, LemburBonusDTO.class);
+				listLemburBonusDTO.add(lemburBonusDTO);
+			}
 		}
+		
 		
 		
 		process.put("Data", listLemburBonusDTO);
