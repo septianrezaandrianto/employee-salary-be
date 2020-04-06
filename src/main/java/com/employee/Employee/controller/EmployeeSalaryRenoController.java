@@ -121,33 +121,39 @@ private static final String DateTimeFormat = null;
 			BigDecimal pph = getPPH(kDTO.getIdKaryawan());
 			BigDecimal bpjs = getBPJS(kDTO.getIdKaryawan());
 			BigDecimal gajiBersih = getGajiBersih(kDTO.getIdKaryawan());
-			LemburBonus lemburBonus = getLemburBonus(kDTO.getIdKaryawan());
-			BigDecimal uangLembur = getUangLembur(kDTO.getIdKaryawan());
-			BigDecimal uangBonus = getUangBonus(kDTO.getIdKaryawan());
-			BigDecimal takeHomePay = getTakeHomePay(kDTO.getIdKaryawan());
+			LemburBonus lemburBonus = getLemburBonus(kDTO.getIdKaryawan(), dateGaji);
+			Integer lamaLembur = 0;
+			Integer variableBonus = 0;
+			if(lemburBonus != null) {
+				lamaLembur = lemburBonus.getLamaLembur();
+				variableBonus = lemburBonus.getVariableBonus();
+			}
+			BigDecimal uangLembur = getUangLembur(kDTO.getIdKaryawan(), dateGaji);
+			BigDecimal uangBonus = getUangBonus(kDTO.getIdKaryawan(), dateGaji);
+			BigDecimal takeHomePay = getTakeHomePay(kDTO.getIdKaryawan(), dateGaji);
 			Pendapatan pendapatan = new Pendapatan();
 			if(!listPendapatan.isEmpty()) {
 				boolean isExistKaryawan = isKaryawanExistInPendapatan(k.getIdKaryawan());
 				
 				if(!isExistKaryawan) {
-					pendapatan = new Pendapatan(0, k, dateGaji, gajiPokok, tjKeluarga, tjPegawai, tjKhusus, gajiKotor, pph, bpjs, gajiBersih, lemburBonus.getLamaLembur(), uangLembur, lemburBonus.getVariableBonus(), uangBonus, takeHomePay);
+					pendapatan = new Pendapatan(0, k, dateGaji, gajiPokok, tjKeluarga, tjPegawai, tjKhusus, gajiKotor, pph, bpjs, gajiBersih, lamaLembur, uangLembur, variableBonus, uangBonus, takeHomePay);
 					pendapatanRepository.save(pendapatan);
 				}else {
 					boolean isExistMonth = isMonthExistInPendapatan(dateGaji,listPendapatan);
 					if(isExistMonth) {
 						for(Pendapatan p: listPendapatan) {
 							if(k.getIdKaryawan() == p.getKaryawan().getIdKaryawan() && p.getTanggalGaji().getMonth() == dateGaji.getMonth()) {
-								pendapatan = new Pendapatan(p.getIdPendapatan(), k, dateGaji, gajiPokok, tjKeluarga, tjPegawai, tjKhusus, gajiKotor, pph, bpjs, gajiBersih, lemburBonus.getLamaLembur(), uangLembur, lemburBonus.getVariableBonus(), uangBonus, takeHomePay);
+								pendapatan = new Pendapatan(p.getIdPendapatan(), k, dateGaji, gajiPokok, tjKeluarga, tjPegawai, tjKhusus, gajiKotor, pph, bpjs, gajiBersih, lamaLembur, uangLembur, variableBonus, uangBonus, takeHomePay);
 								pendapatanRepository.save(pendapatan);
 							}				
 						}
 					}else {
-						pendapatan = new Pendapatan(0, k, dateGaji, gajiPokok, tjKeluarga, tjPegawai, tjKhusus, gajiKotor, pph, bpjs, gajiBersih, lemburBonus.getLamaLembur(), uangLembur, lemburBonus.getVariableBonus(), uangBonus, takeHomePay);
+						pendapatan = new Pendapatan(0, k, dateGaji, gajiPokok, tjKeluarga, tjPegawai, tjKhusus, gajiKotor, pph, bpjs, gajiBersih, lamaLembur, uangLembur, variableBonus, uangBonus, takeHomePay);
 						pendapatanRepository.save(pendapatan);
 					}
 				}
 			}else {
-				pendapatan = new Pendapatan(0, k, dateGaji, gajiPokok, tjKeluarga, tjPegawai, tjKhusus, gajiKotor, pph, bpjs, gajiBersih, lemburBonus.getLamaLembur(), uangLembur, lemburBonus.getVariableBonus(), uangBonus, takeHomePay);
+				pendapatan = new Pendapatan(0, k, dateGaji, gajiPokok, tjKeluarga, tjPegawai, tjKhusus, gajiKotor, pph, bpjs, gajiBersih, lamaLembur, uangLembur, variableBonus, uangBonus, takeHomePay);
 				pendapatanRepository.save(pendapatan);
 			}
 			PendapatanDTO pDTO = modelMapper.map(pendapatan, PendapatanDTO.class);
@@ -298,10 +304,10 @@ private static final String DateTimeFormat = null;
     }
     
     //get LemburBonus By ID Karyawan
-    public LemburBonus getLemburBonus(Integer idKaryawan) {
+    public LemburBonus getLemburBonus(Integer idKaryawan, Date date) {
     	LemburBonus lemburBonus = new LemburBonus();
     	for(LemburBonus lb: lemburBonusRepository.findAll()) {
-    		if(Long.valueOf(idKaryawan) == lb.getIdKaryawan()) {
+    		if(Long.valueOf(idKaryawan) == lb.getIdKaryawan() && lb.getTanggalLemburBonus().getMonth() == date.getMonth()) {
     			lemburBonus = lb;
     		}
     	}
@@ -310,12 +316,16 @@ private static final String DateTimeFormat = null;
     
     //get Uang Lembur
     @GetMapping("/uanglembur/reno/{id}")
-    public BigDecimal getUangLembur(@PathVariable(value = "id")Integer id) {
+    public BigDecimal getUangLembur(@PathVariable(value = "id")Integer id, Date date) {
     	BigDecimal result = new BigDecimal(0);
 		BigDecimal totalPenghasilan = (BigDecimal)getTotalPenghasilan(id);
-		LemburBonus lemburBonus = getLemburBonus(id);
+		LemburBonus lemburBonus = getLemburBonus(id, date);
+		BigDecimal lamaLembur = new BigDecimal(0);
+		if(lemburBonus != null) {
+			lamaLembur = BigDecimal.valueOf(lemburBonus.getLamaLembur());
+		}
 		for(Parameter p: parameterRepository.findAll()) {
-			result = (totalPenghasilan.multiply(p.getLembur())).multiply(BigDecimal.valueOf(lemburBonus.getLamaLembur()));
+			result = (totalPenghasilan.multiply(p.getLembur())).multiply(lamaLembur);
 		}
     	
     	return result;
@@ -323,11 +333,15 @@ private static final String DateTimeFormat = null;
     
     //get Uang Bonus
     @GetMapping("/uangbonus/reno/{id}")
-    public BigDecimal getUangBonus(@PathVariable(value = "id")Integer id) {
+    public BigDecimal getUangBonus(@PathVariable(value = "id")Integer id, Date date) {
     	BigDecimal result = new BigDecimal(0);
 		Karyawan karyawan = karyawanRepository.findById(id).orElse(null);
-		LemburBonus lemburBonus = getLemburBonus(id);
-		BigDecimal variableBonus = BigDecimal.valueOf(lemburBonus.getVariableBonus());
+		LemburBonus lemburBonus = getLemburBonus(id, date);
+		BigDecimal variableBonus = new BigDecimal(0);
+		if(lemburBonus != null) {
+			variableBonus = BigDecimal.valueOf(lemburBonus.getVariableBonus());
+		}
+		
 		BigDecimal maxBonus = new BigDecimal(0);
 		for(Parameter p: parameterRepository.findAll()) {
 			maxBonus = p.getMaxBonus();
@@ -350,11 +364,11 @@ private static final String DateTimeFormat = null;
     
     //TakeHomePay
     @GetMapping("/takehomepay/reno/{id}")
-    public BigDecimal getTakeHomePay(@PathVariable(value = "id")Integer id) {
+    public BigDecimal getTakeHomePay(@PathVariable(value = "id")Integer id, Date date) {
     	BigDecimal result = new BigDecimal(0);
 		BigDecimal gajiBersih = (BigDecimal)getGajiBersih(id);
-		BigDecimal uangLembur = (BigDecimal)getUangLembur(id);
-		BigDecimal uangBonus = (BigDecimal)getUangBonus(id);
+		BigDecimal uangLembur = (BigDecimal)getUangLembur(id, date);
+		BigDecimal uangBonus = (BigDecimal)getUangBonus(id, date);
 		result = (gajiBersih.add(uangLembur)).add(uangBonus);
     	
     	return result;
