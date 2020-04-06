@@ -450,49 +450,5 @@ return hasMap;
 }
 
 	
-////	Insert data into tabel pendapatan
-//	@PostMapping("/calculatesalary/add")
-//	public HashMap<String, Object> insertIntoPendapatan(@RequestParam(value="date")
-//														@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Valid LocalDate date) {		
-//		ZoneId defaultZone = ZoneId.systemDefault();
-//		Date salaryDate = Date.from(date.atStartOfDay(defaultZone).toInstant());	
-//		
-//		HashMap<String, Object> hasMap = new HashMap<String, Object>();
-//
-//		ArrayList<PendapatanDTO> listPendapatanDto = new ArrayList<PendapatanDTO>();
-//		
-//		for (Karyawan kar : karyawanRepository.findAll()) {
-//			for (LemburBonus lb : lemburBonusRepository.findAll()) {	
-//				BigDecimal gajiPokok = getCalculateGapok(kar.getIdKaryawan());
-//				BigDecimal tunjanganKeluarga = getCalculateTunjanganKeluarga(kar.getIdKaryawan());
-//				BigDecimal tunjanganPegawai = (BigDecimal) getCalculateTunjanganPegawai().get(kar.getIdKaryawan());
-//				BigDecimal tunjanganTransport = getCalculateBonusPenempatan(kar.getIdKaryawan());
-//				BigDecimal gajiKotor = getCalculateGajiKotor(kar.getIdKaryawan());
-//				BigDecimal pphPerbulan = getCalculatePPH(kar.getIdKaryawan());
-//				BigDecimal bpjs = getCalculatePotonganBpjs(kar.getIdKaryawan());
-//				BigDecimal gajiBersih = getCalculateGajiBersih(kar.getIdKaryawan());
-//				BigDecimal uangLembur = getCalculateUangLembur(kar.getIdKaryawan(), date);
-//				BigDecimal uangBonus = getCalculateUangBonus(kar.getIdKaryawan(), date);
-//				BigDecimal takeHomePay = getCalculateTakeHomePay(kar.getIdKaryawan(), date);
-//					
-////				for (Pendapatan pen : pendapatanRepository.findAll()) {
-//					
-////					if ( pen.getKaryawan().getIdKaryawan() != kar.getIdKaryawan() && salaryDate.getMonth() != pen.getTanggalGaji().getMonth() && salaryDate.getYear() != pen.getTanggalGaji().getYear()) {
-//						if (lb.getIdKaryawan() == kar.getIdKaryawan()) {		
-//					Pendapatan pendapatan = new Pendapatan (0, kar , salaryDate, gajiPokok,tunjanganKeluarga,tunjanganPegawai,tunjanganTransport,gajiKotor,pphPerbulan,bpjs,gajiBersih, getLamaLembur(kar.getIdKaryawan(), date), uangLembur, getVariabelBonus(kar.getIdKaryawan(), date), uangBonus, takeHomePay);
-//					
-//					pendapatanRepository.save(pendapatan);
-//					
-//					PendapatanDTO pendapatanDto = convertPendapatanEntityToDTO(pendapatan);
-//					listPendapatanDto.add(pendapatanDto);	
-//						
-//					hasMap.put("Total", listPendapatanDto.size());
-//					hasMap.put("Data", listPendapatanDto);
-//				}		
-//			}
-//		}	
-//	return hasMap;
-//	}
-	
 	
 }
