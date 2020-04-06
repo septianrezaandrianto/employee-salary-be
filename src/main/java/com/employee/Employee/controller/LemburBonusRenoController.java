@@ -127,10 +127,10 @@ private static final String DateTimeFormat = null;
 				lemburBonus = new LemburBonus(0, Long.valueOf(k.getIdKaryawan()), inputLemburBonus.getTanggalLemburBonus(), inputLemburBonus.getLamaLembur(), inputLemburBonus.getVariableBonus());
 				lemburBonusRepository.save(lemburBonus);
 			}else {
-				boolean isKaryawanExist = isKaryawanExistInLemburBonus(inputLemburBonus.getIdKaryawan());
+				boolean isKaryawanExist = isKaryawanExistInLemburBonus(Long.valueOf(k.getIdKaryawan()));
 				
 				if(!isKaryawanExist && inputLemburBonus.getIdKaryawan() != null) {
-					lemburBonus = new LemburBonus(0, inputLemburBonus.getIdKaryawan(), inputLemburBonus.getTanggalLemburBonus(), inputLemburBonus.getLamaLembur(), inputLemburBonus.getVariableBonus());
+					lemburBonus = new LemburBonus(0, Long.valueOf(k.getIdKaryawan()), inputLemburBonus.getTanggalLemburBonus(), inputLemburBonus.getLamaLembur(), inputLemburBonus.getVariableBonus());
 					lemburBonusRepository.save(lemburBonus);
 					
 				}else {
