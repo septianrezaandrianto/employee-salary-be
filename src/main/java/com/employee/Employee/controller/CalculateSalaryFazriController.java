@@ -135,6 +135,10 @@ public class CalculateSalaryFazriController {
 			 for(Parameter pr : parameterRepository.findAll()) {
 				 if(pr.getTbParameter().getMonth() == tanggalGaji.getMonth() && pr.getTbParameter().getYear() == tanggalGaji.getYear()) {
 					 tunjanganTransportation = pr.getTTransport();
+				 } else {
+					 for(Parameter temp : parameterRepository.findAll()) {
+						 tunjanganTransportation = temp.getTTransport();
+					 }
 				 }
 			 }
 		 }
@@ -150,6 +154,12 @@ public class CalculateSalaryFazriController {
 			 if(p.getTbParameter().getMonth() == tanggalGaji.getMonth() && p.getTbParameter().getYear() == tanggalGaji.getYear()) {
 				 if(karyawanDto.getStatusPernikahan() == 1) {
 					 tunjanganKeluarga = gajiPokok.multiply(p.getTKeluarga()) ;
+				 }
+			 } else {
+				 for(Parameter temp : parameterRepository.findAll()) {
+					 if(karyawanDto.getStatusPernikahan() == 1) {
+						 tunjanganKeluarga = gajiPokok.multiply(temp.getTKeluarga()) ;
+					 }
 				 }
 			 }
 		 }
@@ -172,6 +182,10 @@ public class CalculateSalaryFazriController {
 		 for(Parameter p : parameterRepository.findAll()) {
 			 if(p.getTbParameter().getMonth() == tanggalGaji.getMonth() && p.getTbParameter().getYear() == tanggalGaji.getYear()) {
 				 bpjs = gajiPokok.multiply(p.getPBpjs());
+			 } else {
+				 for(Parameter temp : parameterRepository.findAll()) {
+					 bpjs = gajiPokok.multiply(temp.getPBpjs());
+				 }
 			 }
 		 }
 		 return bpjs;
@@ -218,6 +232,10 @@ public class CalculateSalaryFazriController {
 				 for(Parameter p : parameterRepository.findAll()) {
 					 if(p.getTbParameter().getMonth() == tanggalGaji.getMonth() && p.getTbParameter().getYear() == tanggalGaji.getYear()) {
 						 uangLembur = gajiKotor.multiply(p.getLembur()).multiply(BigDecimal.valueOf(lb.getLamaLembur()));
+					 } else {
+						 for(Parameter temp : parameterRepository.findAll()) {
+							 uangLembur = gajiKotor.multiply(temp.getLembur()).multiply(BigDecimal.valueOf(lb.getLamaLembur()));
+						 }
 					 }
 				 } 
 			 }
@@ -230,7 +248,7 @@ public class CalculateSalaryFazriController {
  	 public BigDecimal calculateUangBonus(KaryawanDTO karyawanDto, Date tanggalGaji) {
 		 BigDecimal uangBonus = new BigDecimal(0);
 		 for(LemburBonus lb : lemburBonusRepository.findAll()) {
-			 if(karyawanDto.getIdKaryawan() == lb.getIdKaryawan() ) {
+			 if(karyawanDto.getIdKaryawan() == lb.getIdKaryawan() && tanggalGaji.getMonth() == lb.getTanggalLemburBonus().getMonth() && tanggalGaji.getYear() == lb.getTanggalLemburBonus().getYear()) {
 				 for(Parameter p : parameterRepository.findAll()) {
 					 if(p.getTbParameter().getMonth() == tanggalGaji.getMonth() && p.getTbParameter().getYear() == tanggalGaji.getYear()) {
 						 if(karyawanDto.getPosisi().getNamaPosisi().equalsIgnoreCase("Programmer")) {
@@ -242,6 +260,18 @@ public class CalculateSalaryFazriController {
 							if(karyawanDto.getPosisi().getNamaPosisi().equalsIgnoreCase("Technical Writter")) {
 								uangBonus = (p.getBonusTw().multiply(BigDecimal.valueOf(lb.getVariableBonus()))).divide(BigDecimal.valueOf(p.getBatasanBonusTw()));
 							}
+					 } else {
+						 for(Parameter temp : parameterRepository.findAll()) {
+							if(karyawanDto.getPosisi().getNamaPosisi().equalsIgnoreCase("Programmer")) {
+								uangBonus = (temp.getBonusPg().multiply(BigDecimal.valueOf(lb.getVariableBonus()))).divide(BigDecimal.valueOf(temp.getBatasanBonusPg()));
+							}
+							if(karyawanDto.getPosisi().getNamaPosisi().equalsIgnoreCase("Tester")) {
+								uangBonus = (temp.getBonusTs().multiply(BigDecimal.valueOf(lb.getVariableBonus()))).divide(BigDecimal.valueOf(temp.getBatasanBonusTs()));
+							}
+							if(karyawanDto.getPosisi().getNamaPosisi().equalsIgnoreCase("Technical Writter")) {
+								uangBonus = (temp.getBonusTw().multiply(BigDecimal.valueOf(lb.getVariableBonus()))).divide(BigDecimal.valueOf(temp.getBatasanBonusTw()));
+							}
+						 }
 					 }
 				 }
 			 }
@@ -251,6 +281,12 @@ public class CalculateSalaryFazriController {
 					if(uangBonus.doubleValue() > p.getMaxBonus().doubleValue()) {
 						uangBonus = p.getMaxBonus();
 					}
+				 } else {
+					 for(Parameter temp : parameterRepository.findAll()) {
+						 if(uangBonus.doubleValue() > temp.getMaxBonus().doubleValue()) {
+							uangBonus = temp.getMaxBonus();
+						}
+					 }
 				 }
 			 }
 		 }
@@ -291,7 +327,60 @@ public class CalculateSalaryFazriController {
 		return isExist;
 	}
 		
-	 // Proses Insert 
+	// Proses Insert Ke database
+	public List<Pendapatan> insertCalculateSalary(Date tanggalGaji) {
+		List<Pendapatan> resutlList = new ArrayList<Pendapatan>();
+		BigDecimal gajiPokok = new BigDecimal(0);
+    	BigDecimal tunjanganKeluarga = new BigDecimal(0);
+    	BigDecimal tunjanganPegawai = new BigDecimal(0);
+    	BigDecimal tunjanganTransportasi = new BigDecimal(0);
+    	BigDecimal bpjs = new BigDecimal(0);
+    	BigDecimal pph = new BigDecimal(0);
+    	BigDecimal gajiKotor = new BigDecimal(0);
+    	BigDecimal gajiBersih = new BigDecimal(0);
+    	BigDecimal uangLembur = new BigDecimal(0);
+    	BigDecimal uangBonus = new BigDecimal(0);
+    	BigDecimal takeHomePay = new BigDecimal(0);
+    	
+    	for(Karyawan k : karyawanRepository.findAll()) {
+			KaryawanDTO karyawanDto = convertToDTO(k);
+			gajiPokok = calculateGajiPokok(karyawanDto);
+			tunjanganKeluarga = getTunjanganKeluarga(karyawanDto, tanggalGaji);
+			tunjanganPegawai = getTunjanganPegawai(karyawanDto);
+			tunjanganTransportasi = getTunjanganTransportation(karyawanDto, tanggalGaji);
+			bpjs = calculatePotonganBPJS(karyawanDto, tanggalGaji);
+			pph = calculatePph(karyawanDto, tanggalGaji);
+			gajiKotor = calculateGajiKotor(karyawanDto, tanggalGaji);
+			gajiBersih = calculateGajiBersih(karyawanDto, tanggalGaji);
+			uangLembur = calculateUangLembur(karyawanDto, tanggalGaji);
+			uangBonus = calculateUangBonus(karyawanDto, tanggalGaji);
+			takeHomePay = calculateTakeHomePay(karyawanDto, tanggalGaji);
+			
+			LemburBonus lemburBonus = getLemburBonus(karyawanDto, tanggalGaji);
+			Pendapatan pendapatan = new Pendapatan();
+				
+			pendapatan.setKaryawan(convertToEntity(karyawanDto));
+			pendapatan.setTanggalGaji(tanggalGaji);
+			pendapatan.setGajiPokok(gajiPokok);
+			pendapatan.setTunjanganKeluarga(tunjanganKeluarga);
+			pendapatan.setTunjanganPegawai(tunjanganPegawai);
+			pendapatan.setTunjanganTransport(tunjanganTransportasi);
+			pendapatan.setBpjs(bpjs);
+			pendapatan.setPphPerbulan(pph);
+			pendapatan.setGajiKotor(gajiKotor);
+			pendapatan.setGajiBersih(gajiBersih);
+			pendapatan.setUangLembur(uangLembur);
+			pendapatan.setLamaLembur(lemburBonus.getLamaLembur());
+			pendapatan.setVariableBonus(lemburBonus.getVariableBonus());
+			pendapatan.setUangBonus(uangBonus);
+			pendapatan.setTakeHomePay(takeHomePay);
+			pendapatanRepository.save(pendapatan);
+			resutlList.add(pendapatan);	
+    	}
+		return resutlList;
+    	
+	}
+	
 	 // Menghitung Gaji semua karyawan
 	 @SuppressWarnings("deprecation")
 	 @PostMapping("/pendapatan/calculateSalary")
@@ -301,6 +390,7 @@ public class CalculateSalaryFazriController {
 		List<Pendapatan> resutlList = new ArrayList<Pendapatan>();
 		Date tanggalGaji = new SimpleDateFormat("yyyy-MM-dd").parse(date);
     	String message = "";
+    	boolean isInsert = false;
     	BigDecimal gajiPokok = new BigDecimal(0);
     	BigDecimal tunjanganKeluarga = new BigDecimal(0);
     	BigDecimal tunjanganPegawai = new BigDecimal(0);
@@ -347,7 +437,7 @@ public class CalculateSalaryFazriController {
 			pendapatan.setTakeHomePay(takeHomePay);
     	
     	if(listPendapatans.isEmpty()) {
-			pendapatanRepository.save(pendapatan);
+    		pendapatanRepository.save(pendapatan);
 			resutlList.add(pendapatan);	
 			message = "Create Success!";
     		
@@ -374,19 +464,20 @@ public class CalculateSalaryFazriController {
 			    			pendapatanRepository.save(p);
 			    			resutlList.add(p);	
 			    			message = "Update Success!";
-    					}
+    					} 
     				}
     			} else {
-    				pendapatanRepository.save(pendapatan);
-        			resutlList.add(pendapatan);	
-        			message = "Create Success!";
+    				isInsert = true;
     			}
     		} else {
-    			pendapatanRepository.save(pendapatan);
-    			resutlList.add(pendapatan);	
-    			message = "Create Success!";
+    			isInsert = true;
     			}
     		}
+    	}
+    	
+    	if(isInsert) {
+    		resutlList = insertCalculateSalary(tanggalGaji);	
+			message = "Create Success!";
     	}
     	showHashMap.put("Message", message);
     	showHashMap.put("Data", resutlList);
