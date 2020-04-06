@@ -115,16 +115,16 @@ public class LemburBonusYanuController {
     }
 
     public Long getLemburBonusId(LemburBonusDTO lemburBonusDTO) {
-        SimpleDateFormat simDatM = new SimpleDateFormat("MM");
-        SimpleDateFormat simDatY = new SimpleDateFormat("yyyy");
+        SimpleDateFormat simDatMonth = new SimpleDateFormat("MM");
+        SimpleDateFormat simDatYear = new SimpleDateFormat("yyyy");
         Long id = null;
 
         for (LemburBonus tempLem : lemburBonusRepository.findAll()) {
-            String month = simDatM.format(lemburBonusDTO.getTanggalLemburBonus());
-            String year = simDatY.format(lemburBonusDTO.getTanggalLemburBonus());
+            String month = simDatMonth.format(lemburBonusDTO.getTanggalLemburBonus());
+            String year = simDatYear.format(lemburBonusDTO.getTanggalLemburBonus());
 
-            String temMo = simDatM.format(tempLem.getTanggalLemburBonus());
-            String temYe = simDatY.format(tempLem.getTanggalLemburBonus());
+            String temMo = simDatMonth.format(tempLem.getTanggalLemburBonus());
+            String temYe = simDatYear.format(tempLem.getTanggalLemburBonus());
 
             if (lemburBonusDTO.getIdKaryawan() == convertToDTO(tempLem).getIdKaryawan() && month.equalsIgnoreCase(temMo) && year.equalsIgnoreCase(temYe)) {
                 id = tempLem.getIdLemburBonus();
@@ -136,16 +136,16 @@ public class LemburBonusYanuController {
     }
 
     public boolean newLemburBonusValidation(LemburBonusDTO lemburBonusDTO) {
-        SimpleDateFormat simDatM = new SimpleDateFormat("MM");
-        SimpleDateFormat simDatY = new SimpleDateFormat("yyyy");
+        SimpleDateFormat simDatMonth = new SimpleDateFormat("MM");
+        SimpleDateFormat simDatYear = new SimpleDateFormat("yyyy");
         boolean isNew = true;
 
         for (LemburBonus tempLem : lemburBonusRepository.findAll()) {
-            String month = simDatM.format(lemburBonusDTO.getTanggalLemburBonus());
-            String year = simDatY.format(lemburBonusDTO.getTanggalLemburBonus());
+            String month = simDatMonth.format(lemburBonusDTO.getTanggalLemburBonus());
+            String year = simDatYear.format(lemburBonusDTO.getTanggalLemburBonus());
 
-            String temMo = simDatM.format(tempLem.getTanggalLemburBonus());
-            String temYe = simDatY.format(tempLem.getTanggalLemburBonus());
+            String temMo = simDatMonth.format(tempLem.getTanggalLemburBonus());
+            String temYe = simDatYear.format(tempLem.getTanggalLemburBonus());
 
             if (lemburBonusDTO.getIdKaryawan() == convertToDTO(tempLem).getIdKaryawan() && month.equalsIgnoreCase(temMo) && year.equalsIgnoreCase(temYe)) {
                 isNew = false;

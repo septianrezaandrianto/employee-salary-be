@@ -1,12 +1,15 @@
 package com.employee.Employee.controller;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
+import com.employee.Employee.dto.PendapatanDTO;
 import com.employee.Employee.model.Karyawan;
 import com.employee.Employee.model.LemburBonus;
 import com.employee.Employee.model.Parameter;
+import com.employee.Employee.model.Pendapatan;
 import com.employee.Employee.model.Penempatan;
 import com.employee.Employee.model.PresentaseGaji;
 import com.employee.Employee.model.TunjanganPegawai;
@@ -52,42 +55,118 @@ public class CalculateSalaryYanuController {
     LemburBonusRepository lemburBonusRepository;
 
     ModelMapper modelMapper = new ModelMapper();
-
-    // public HashMap<String, Object> getAllPendapatan(@RequestParam(name = "date") Date date) {
-    //     HashMap<String, Object> result = new HashMap<String, Object>();
-
-
-
-    //     return result;
-    // }
     
-    @GetMapping("/test/yanu")
+    @GetMapping("/calculate-salary-yanu")
     public HashMap<Integer, Object> calculateTakeHomePay(@RequestParam(name = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date requestDate) {
-        HashMap<Integer, Object> a = new HashMap<Integer, Object>();
+        SimpleDateFormat simDatMonth = new SimpleDateFormat("MM");
+        SimpleDateFormat simDatYear = new SimpleDateFormat("yyyy");
+        HashMap<Integer, Object> result = new HashMap<Integer, Object>();
 
-        // if (newMonthValidation(requestDate)) {
+        if (newMonthAndYearValidation(requestDate)) {
             for (Karyawan tempKar : karyawanRepository.findAll()) {
-                double gajiKotor = calculateGajiPokok(tempKar) + calculateTunjangan(requestDate, calculateGajiPokok(tempKar), tempKar);
-                double bpjs = calculateBPJS(requestDate, calculateGajiPokok(tempKar));
-                double pph = calculatePPH(gajiKotor);
+                Pendapatan pendapatan = new Pendapatan();
 
-                a.put(tempKar.getIdKaryawan(), pph);
+                double gajiPokok = calculateGajiPokok(tempKar);
+                double tunjangan = calculateAllTunjangan(requestDate, gajiPokok, tempKar);
+                double gajiKotor = gajiPokok + tunjangan;
+                
+                double potongan = calculateAllPotongan(gajiPokok, gajiKotor, requestDate);
+                double gajiBersih = gajiKotor - potongan;
+
+                double bonus = calculateAllBonus(requestDate, gajiPokok, tempKar);
+                double takeHomePay = gajiBersih + bonus;
+
+                pendapatan.setKaryawan(tempKar);
+                pendapatan.setTanggalGaji(requestDate);
+                pendapatan.setGajiPokok(BigDecimal.valueOf(gajiPokok));
+                pendapatan.setTunjanganKeluarga(BigDecimal.valueOf(calculateTunjanganPernikahan(tempKar, requestDate)));
+                pendapatan.setTunjanganPegawai(BigDecimal.valueOf(chooseTunjanganPegawai(tempKar)));
+                pendapatan.setTunjanganTransport(BigDecimal.valueOf(calculateTunjanganTransport(tempKar, requestDate)));
+                pendapatan.setGajiKotor(BigDecimal.valueOf(gajiKotor));
+                pendapatan.setPphPerbulan(BigDecimal.valueOf(calculatePPH(gajiKotor)));
+                pendapatan.setBpjs(BigDecimal.valueOf(calculateBPJS(requestDate, calculateGajiPokok(tempKar))));
+                pendapatan.setGajiBersih(BigDecimal.valueOf(gajiBersih));
+
+                for (LemburBonus tempLem : lemburBonusRepository.findAll()) {
+                    if (simDatMonth.format(tempLem.getTanggalLemburBonus()).equals(simDatMonth.format(requestDate)) && simDatYear.format(tempLem.getTanggalLemburBonus()).equals(simDatYear.format(requestDate)) && tempKar.getIdKaryawan() == tempLem.getIdKaryawan()) {
+                        pendapatan.setLamaLembur(tempLem.getLamaLembur());
+                        pendapatan.setVariableBonus(tempLem.getVariableBonus());
+                        break;
+                    } else {
+                        pendapatan.setLamaLembur(0);
+                        pendapatan.setVariableBonus(0);
+                    }
+                }
+
+                pendapatan.setUangLembur(BigDecimal.valueOf(calculateLembur(gajiKotor, tempKar, requestDate)));
+                pendapatan.setUangBonus(BigDecimal.valueOf(calculateBonus(tempKar, requestDate)));
+                pendapatan.setTakeHomePay(BigDecimal.valueOf(takeHomePay));
+
+                pendapatanRepository.save(pendapatan);
+
+                result.put(tempKar.getIdKaryawan(), takeHomePay);
             }
-        // }
+        } else {
+            for (Pendapatan tempPen : pendapatanRepository.findAll() ) {
+                if (simDatMonth.format(tempPen.getTanggalGaji()).equals(simDatMonth.format(requestDate)) && simDatYear.format(tempPen.getTanggalGaji()).equals(simDatYear.format(requestDate))) {
+                    for (Karyawan tempKar : karyawanRepository.findAll()) {
+                        if (tempKar.getIdKaryawan() == tempPen.getKaryawan().getIdKaryawan()){
+                            PendapatanDTO updatedPendapatan = convertToDTO(pendapatanRepository.findById(tempPen.getIdPendapatan()).get());
 
-        return a;
+                            double gajiPokok = calculateGajiPokok(tempKar);
+                            double tunjangan = calculateAllTunjangan(requestDate, gajiPokok, tempKar);
+                            double gajiKotor = gajiPokok + tunjangan;
+                            
+                            double potongan = calculateAllPotongan(gajiPokok, gajiKotor, requestDate);
+                            double gajiBersih = gajiKotor - potongan;
+            
+                            double bonus = calculateAllBonus(requestDate, gajiPokok, tempKar);
+                            double takeHomePay = gajiBersih + bonus;
+
+                            updatedPendapatan.setTanggalGaji(requestDate);
+                            updatedPendapatan.setGajiPokok(BigDecimal.valueOf(gajiPokok));
+                            updatedPendapatan.setTunjanganKeluarga(BigDecimal.valueOf(calculateTunjanganPernikahan(tempKar, requestDate)));
+                            updatedPendapatan.setTunjanganPegawai(BigDecimal.valueOf(chooseTunjanganPegawai(tempKar)));
+                            updatedPendapatan.setTunjanganTransport(BigDecimal.valueOf(calculateTunjanganTransport(tempKar, requestDate)));
+                            updatedPendapatan.setGajiKotor(BigDecimal.valueOf(gajiKotor));
+                            updatedPendapatan.setPphPerbulan(BigDecimal.valueOf(calculatePPH(gajiKotor)));
+                            updatedPendapatan.setBpjs(BigDecimal.valueOf(calculateBPJS(requestDate, calculateGajiPokok(tempKar))));
+                            updatedPendapatan.setGajiBersih(BigDecimal.valueOf(gajiBersih));
+
+                            for (LemburBonus tempLem : lemburBonusRepository.findAll()) {
+                                if (simDatMonth.format(tempLem.getTanggalLemburBonus()).equals(simDatMonth.format(requestDate)) && simDatYear.format(tempLem.getTanggalLemburBonus()).equals(simDatYear.format(requestDate)) && tempKar.getIdKaryawan() == tempLem.getIdKaryawan()) {
+                                    updatedPendapatan.setLamaLembur(tempLem.getLamaLembur());
+                                    updatedPendapatan.setVariableBonus(tempLem.getVariableBonus());
+                                    break;
+                                } else {
+                                    updatedPendapatan.setLamaLembur(0);
+                                    updatedPendapatan.setVariableBonus(0);
+                                }
+                            }
+
+                            updatedPendapatan.setUangLembur(BigDecimal.valueOf(calculateLembur(gajiKotor, tempKar, requestDate)));
+                            updatedPendapatan.setUangBonus(BigDecimal.valueOf(calculateBonus(tempKar, requestDate)));
+                            updatedPendapatan.setTakeHomePay(BigDecimal.valueOf(takeHomePay));
+
+                            pendapatanRepository.save(convertToEntity(updatedPendapatan));
+
+                            result.put(tempKar.getIdKaryawan(), takeHomePay);
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
-    public double calculateLembur(LemburBonus lemburBonus, Parameter parameter) {
-        return Double.parseDouble(String.valueOf(lemburBonus.getLamaLembur())) * parameter.getLembur().doubleValue();
-    }
-
-    public boolean newMonthValidation(Date requestDate) {
-        SimpleDateFormat simDat = new SimpleDateFormat("MM");
+    public boolean newMonthAndYearValidation(Date requestDate) {
+        SimpleDateFormat simDatMonth = new SimpleDateFormat("MM");
+        SimpleDateFormat simDatYear = new SimpleDateFormat("yyyy");
         boolean isNew = true;
 
-        for (Parameter tempPar : parameterRepository.findAll()) {
-            if (simDat.format(tempPar.getTbParameter()).equals(simDat.format(requestDate))) {
+        for (Pendapatan tempPen : pendapatanRepository.findAll()) {
+            if (simDatMonth.format(tempPen.getTanggalGaji()).equals(simDatMonth.format(requestDate)) && simDatYear.format(tempPen.getTanggalGaji()).equals(simDatYear.format(requestDate))) {
                 isNew = false;
                 break;
             }
@@ -96,21 +175,37 @@ public class CalculateSalaryYanuController {
         return isNew;
     }
 
-    public double calculateTunjangan(Date requestDate, double gajiPokok, Karyawan karyawan) {
-        SimpleDateFormat simDatM = new SimpleDateFormat("MM");
-        SimpleDateFormat simDatY = new SimpleDateFormat("yyyy");
+    public double calculateAllTunjangan(Date requestDate, double gajiPokok, Karyawan karyawan) {
         double result = chooseTunjanganPegawai(karyawan);
 
-        for (Parameter tempPar : parameterRepository.findAll()) {
-            if (simDatM.format(tempPar.getTbParameter()).equals(simDatM.format(requestDate)) && simDatY.format(tempPar.getTbParameter()).equals(simDatY.format(requestDate))) {
-                if (karyawan.getStatusPernikahan() == 1) {
-                    result += calculateTunjanganPernikahan(karyawan, tempPar);
-                }
+        result += calculateTunjanganPernikahan(karyawan, requestDate);
+        result += calculateTunjanganTransport(karyawan, requestDate);
 
-                if (karyawan.getPenempatan().getKotaPenempatan().equals("DKI Jakarta")) {
-                    result += calculateTunjanganTransport(tempPar);
+        return result;
+    }
+
+    public double calculateAllBonus(Date requestDate, double gajiPokok, Karyawan karyawan) {
+        double result = 0;
+
+        result += calculateLembur(gajiPokok, karyawan, requestDate);
+        result += calculateBonus(karyawan, requestDate);
+
+        return result;
+    }
+
+    public double calculateLembur(double gajiKotor, Karyawan karyawan, Date requestDate) {
+        SimpleDateFormat simDatMonth = new SimpleDateFormat("MM");
+        SimpleDateFormat simDatYear = new SimpleDateFormat("yyyy");
+        double result = 0;
+
+        for (Parameter tempPar : parameterRepository.findAll()) {
+            if (simDatMonth.format(tempPar.getTbParameter()).equals(simDatMonth.format(requestDate)) && simDatYear.format(tempPar.getTbParameter()).equals(simDatYear.format(requestDate))) {
+                for (LemburBonus tempLem : lemburBonusRepository.findAll()) {
+                    if (simDatMonth.format(tempLem.getTanggalLemburBonus()).equals(simDatMonth.format(tempPar.getTbParameter())) && simDatYear.format(tempLem.getTanggalLemburBonus()).equals(simDatYear.format(tempPar.getTbParameter())) && karyawan.getIdKaryawan() == tempLem.getIdKaryawan()) {
+                        result = (gajiKotor * tempLem.getLamaLembur()) * tempPar.getLembur().doubleValue();
+                        break;
+                    }
                 }
-                
                 break;
             }
         }
@@ -118,12 +213,95 @@ public class CalculateSalaryYanuController {
         return result;
     }
 
-    public double calculateTunjanganPernikahan(Karyawan karyawan, Parameter parameter) {
-        return calculateGajiPokok(karyawan) * parameter.getTKeluarga().doubleValue();
+    public double calculateBonus(Karyawan karyawan, Date requestDate) {
+        SimpleDateFormat simDatMonth = new SimpleDateFormat("MM");
+        SimpleDateFormat simDatYear = new SimpleDateFormat("yyyy");
+        double result = 0;
+
+        for (Parameter tempPar : parameterRepository.findAll()) {
+            if (simDatMonth.format(tempPar.getTbParameter()).equals(simDatMonth.format(requestDate)) && simDatYear.format(tempPar.getTbParameter()).equals(simDatYear.format(requestDate))) {      
+                for (LemburBonus tempLem : lemburBonusRepository.findAll()) {
+                    if (simDatMonth.format(tempLem.getTanggalLemburBonus()).equals(simDatMonth.format(tempPar.getTbParameter())) && simDatYear.format(tempLem.getTanggalLemburBonus()).equals(simDatYear.format(tempPar.getTbParameter())) && karyawan.getIdKaryawan() == tempLem.getIdKaryawan() && karyawan.getPosisi().getIdPosisi() != 2) {
+                        result = (tempLem.getVariableBonus() / chooseBatasanBonus(karyawan.getIdKaryawan(), tempPar)) * chooseBonus(karyawan.getIdKaryawan(), tempPar);
+
+                        if (result > tempPar.getMaxBonus().doubleValue()) {
+                            result = tempPar.getMaxBonus().doubleValue();
+                        }
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
+        return result;
     }
 
-    public double calculateTunjanganTransport(Parameter parameter) {
-        return parameter.getTTransport().doubleValue();
+    public double chooseBonus(Integer karyawanId, Parameter parameter) {
+        double bonus = 0;
+        Karyawan karyawan = karyawanRepository.findById(karyawanId).get();
+
+        if (karyawan.getPosisi().getNamaPosisi().equalsIgnoreCase("Programmer")) {
+            bonus = parameter.getBonusPg().doubleValue();
+        } else if (karyawan.getPosisi().getNamaPosisi().equalsIgnoreCase("Tester")) {
+            bonus = parameter.getBonusTs().doubleValue();
+        } else if (karyawan.getPosisi().getNamaPosisi().equalsIgnoreCase("Technical Writter")) {
+            bonus = parameter.getBonusTw().doubleValue();
+        }
+        
+        return bonus;
+    }
+
+    public double chooseBatasanBonus(Integer karyawanId, Parameter parameter) {
+        double batasanBonus = 0;
+        Karyawan karyawan = karyawanRepository.findById(karyawanId).get();
+
+        if (karyawan.getPosisi().getNamaPosisi().equalsIgnoreCase("Programmer")) {
+            batasanBonus = parameter.getBatasanBonusPg();
+        } else if (karyawan.getPosisi().getNamaPosisi().equalsIgnoreCase("Tester")) {
+            batasanBonus = parameter.getBatasanBonusTs();
+        } else if (karyawan.getPosisi().getNamaPosisi().equalsIgnoreCase("Technical Writter")) {
+            batasanBonus = parameter.getBatasanBonusTw();
+        }
+        
+        return batasanBonus;
+    }
+
+    public double calculateTunjanganPernikahan(Karyawan karyawan, Date requestDate) {
+        SimpleDateFormat simDatMonth = new SimpleDateFormat("MM");
+        SimpleDateFormat simDatYear = new SimpleDateFormat("yyyy");
+        double tunjanganPernikahan = 0;
+
+        for (Parameter tempPar : parameterRepository.findAll()) {
+            if (simDatMonth.format(tempPar.getTbParameter()).equals(simDatMonth.format(requestDate)) && simDatYear.format(tempPar.getTbParameter()).equals(simDatYear.format(requestDate)) && karyawan.getStatusPernikahan() == 1) {
+                tunjanganPernikahan = calculateGajiPokok(karyawan) * tempPar.getTKeluarga().doubleValue();
+            }
+        }
+
+        return tunjanganPernikahan;
+    }
+
+    public double calculateTunjanganTransport(Karyawan karyawan, Date requestDate) {
+        SimpleDateFormat simDatMonth = new SimpleDateFormat("MM");
+        SimpleDateFormat simDatYear = new SimpleDateFormat("yyyy");
+        double tunjanganTransport = 0;
+
+        for (Parameter tempPar : parameterRepository.findAll()) {
+            if (simDatMonth.format(tempPar.getTbParameter()).equals(simDatMonth.format(requestDate)) && simDatYear.format(tempPar.getTbParameter()).equals(simDatYear.format(requestDate)) && karyawan.getPenempatan().getKotaPenempatan().equals("DKI Jakarta")) {
+                tunjanganTransport = tempPar.getTTransport().doubleValue();
+            }
+        }
+        
+        return tunjanganTransport;
+    }
+
+    public double calculateAllPotongan(double gajiPokok, double gajiKotor, Date requestDate) {
+        double result = 0;
+        
+        result = calculateBPJS(requestDate, gajiPokok);
+        result += calculatePPH(gajiKotor);
+
+        return result;
     }
 
     public double calculatePPH(double gajiKotor) {
@@ -132,10 +310,11 @@ public class CalculateSalaryYanuController {
 
     public double calculateBPJS(Date requestDate, double gajiPokok) {
         SimpleDateFormat simDat = new SimpleDateFormat("MM");
+        SimpleDateFormat simDatYear = new SimpleDateFormat("yyyy");
         double result = 0;
 
         for (Parameter tempPar : parameterRepository.findAll()) {
-            if (simDat.format(tempPar.getTbParameter()).equals(simDat.format(requestDate))) {
+            if (simDat.format(tempPar.getTbParameter()).equals(simDat.format(requestDate)) && simDatYear.format(tempPar.getTbParameter()).equals(simDatYear.format(requestDate))) {
                 result += gajiPokok * tempPar.getPBpjs().doubleValue();
                 break;
             }
@@ -154,6 +333,7 @@ public class CalculateSalaryYanuController {
         for (Penempatan tempPen : penempatanRepository.findAll()) {
             if (karyawan.getPenempatan().getIdPenempatan() == tempPen.getIdPenempatan()) {
                 umk = tempPen.getUmkPenempatan().doubleValue();
+                break;
             }
         }
 
@@ -183,10 +363,19 @@ public class CalculateSalaryYanuController {
         for (TunjanganPegawai tempTun : tunjanganPegawaiRepository.findAll()) {
             if (karyawan.getPosisi().getIdPosisi() == tempTun.getPosisi().getIdPosisi() && karyawan.getTingkatan().getIdTingkatan() == tempTun.getTingkatan().getIdTingkatan()) {
                 tunjanganPegawai = tempTun.getBesaranTujnaganPegawai().doubleValue();
+                break;
             }
         }
 
         return tunjanganPegawai;
+    }
+
+    public PendapatanDTO convertToDTO(Pendapatan pendapatan) {
+        return modelMapper.map(pendapatan, PendapatanDTO.class);
+    }
+
+    public Pendapatan convertToEntity(PendapatanDTO pendapatanDTO) {
+        return modelMapper.map(pendapatanDTO, Pendapatan.class);
     }
 
 }
