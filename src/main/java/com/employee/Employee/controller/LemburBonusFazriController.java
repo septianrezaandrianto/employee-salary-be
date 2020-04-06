@@ -97,9 +97,10 @@ public class LemburBonusFazriController {
     	HashMap<String, Object> showHashMap = new HashMap<String, Object>();
     	String message = "";
     	boolean isInsert = false;
+    	boolean isUpdate = false;
     	LemburBonus lemburBonus = convertToEntity(lemburBonusDto);
     	List<LemburBonus> listLemburBonuss = new ArrayList<LemburBonus>();
-    	Date tanggalGaji = new SimpleDateFormat("yyyy-mm-dd").parse(date);
+    	Date tanggalGaji = new SimpleDateFormat("yyyy-MM-dd").parse(date);
     	
     	if(lemburBonusRepository.findAll().isEmpty()) {
     		isInsert = true;
@@ -110,8 +111,7 @@ public class LemburBonusFazriController {
 					lb.setLamaLembur(lemburBonus.getLamaLembur());
 					lb.setVariableBonus(lemburBonus.getVariableBonus());
 					lemburBonusRepository.save(lemburBonus);
-//					listLemburBonuss.add(lemburBonus);
-					message = "Update Success!";
+					isUpdate = true;
 				} else {
 					isInsert = true;
 				}
@@ -122,6 +122,9 @@ public class LemburBonusFazriController {
     		lemburBonusRepository.save(lemburBonus);
 			listLemburBonuss.add(lemburBonus);	
 			message = "Create Success!";
+    	} 
+    	if(isUpdate) {
+    		message = "Update Success!";
     	}
     
     	showHashMap.put("Message", message);
