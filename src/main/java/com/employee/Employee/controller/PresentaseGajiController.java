@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +25,7 @@ import com.employee.Employee.repository.PresentaseGajiRepository;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class PresentaseGajiController {
 	
 	@Autowired
@@ -125,7 +127,7 @@ public class PresentaseGajiController {
 		
 		presentaseGajiDTO.setIdPresentaseGaji(presentaseGaji.getIdPresentaseGaji());
 		
-		if (presentaseGajiDTO.getPosisiDto() != null) {
+		if (presentaseGajiDTO.getPosisiDto() == null) {
 			presentaseGaji.setPosisi(convertDTOToEntity(presentaseGajiDTO).getPosisi());
 		}
 		

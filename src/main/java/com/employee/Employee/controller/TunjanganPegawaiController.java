@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,7 @@ import com.employee.Employee.repository.TunjanganPegawaiRepository;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class TunjanganPegawaiController {
 	
 	ModelMapper modelMapper = new ModelMapper();
@@ -48,9 +50,9 @@ public class TunjanganPegawaiController {
 			tunjanganPegawaiDTOs.add(convertToDTO(tunjanganPegawai));
 		}
 			
-		hmTunjanganPegawai.put("Message : ", "Read All Tunjangan Pegawai Succes!");
-		hmTunjanganPegawai.put("Total : ", tunjanganPegawaiDTOs.size());
-		hmTunjanganPegawai.put("Data : ", tunjanganPegawaiDTOs);
+		hmTunjanganPegawai.put("Message", "Read All Tunjangan Pegawai Succes!");
+		hmTunjanganPegawai.put("Total", tunjanganPegawaiDTOs.size());
+		hmTunjanganPegawai.put("Data", tunjanganPegawaiDTOs);
 			
 		return hmTunjanganPegawai;
 	}

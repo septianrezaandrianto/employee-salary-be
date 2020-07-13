@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import com.employee.Employee.repository.AgamaRepository;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class AgamaController {
 	 
 	 ModelMapper modelMapper = new ModelMapper();
@@ -154,7 +156,7 @@ public class AgamaController {
     	Agama agama = agamaRepository.findById(id)
     			.orElse(null);
 
-    	agamaRepository.delete(agamaRepository.findById(id).get());
+    	agamaRepository.delete(agama);
 
         showHashMap.put("Messages", "Delete Data Success!");
         showHashMap.put("Delete data :", agama);

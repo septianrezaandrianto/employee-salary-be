@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import com.employee.Employee.repository.ParameterRepository;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ParameterController {
 	
 	ModelMapper modelMapper = new ModelMapper();
@@ -49,9 +51,9 @@ public class ParameterController {
 			parameterDTOs.add(convertToDTO(parameter));
 		}
 		
-		hmParameter.put("Message : ", "Read All Parameter Succes!");
-		hmParameter.put("Total : ", parameterDTOs.size());
-		hmParameter.put("Data : ", parameterDTOs);
+		hmParameter.put("Message", "Read All Parameter Succes!");
+		hmParameter.put("Total", parameterDTOs.size());
+		hmParameter.put("Data", parameterDTOs);
 		
 		return hmParameter;
 	}

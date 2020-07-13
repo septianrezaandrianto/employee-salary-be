@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,6 +40,7 @@ import com.employee.Employee.repository.TunjanganPegawaiRepository;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CalculateSalaryRezaController {
 	
 	@Autowired
@@ -411,10 +413,12 @@ public HashMap<String, Object> insertIntoPendapatan(@RequestParam(value="date")
 	
 	HashMap<String, Object> hasMap = new HashMap<String, Object>();
 
+	ArrayList<Pendapatan> listPendapatan = new ArrayList<Pendapatan>();
 	ArrayList<PendapatanDTO> listPendapatanDto = new ArrayList<PendapatanDTO>();
 	
 	for (Karyawan kar : karyawanRepository.findAll()) {
-		for (LemburBonus lb : lemburBonusRepository.findAll()) {	
+		for (LemburBonus lb : lemburBonusRepository.findAll()) {
+			
 			BigDecimal gajiPokok = getCalculateGapok(kar.getIdKaryawan());
 			BigDecimal tunjanganKeluarga = getCalculateTunjanganKeluarga(kar.getIdKaryawan());
 			BigDecimal tunjanganPegawai = (BigDecimal) getCalculateTunjanganPegawai().get(kar.getIdKaryawan());
@@ -426,29 +430,31 @@ public HashMap<String, Object> insertIntoPendapatan(@RequestParam(value="date")
 			BigDecimal uangLembur = getCalculateUangLembur(kar.getIdKaryawan(), date);
 			BigDecimal uangBonus = getCalculateUangBonus(kar.getIdKaryawan(), date);
 			BigDecimal takeHomePay = getCalculateTakeHomePay(kar.getIdKaryawan(), date);
-				
+
 //			for (Pendapatan pen : pendapatanRepository.findAll()) {
-				
-//				if ( pen.getKaryawan().getIdKaryawan() != kar.getIdKaryawan() && salaryDate.getMonth() != pen.getTanggalGaji().getMonth() && salaryDate.getYear() != pen.getTanggalGaji().getYear()) {
-				
-			if (lb.getIdKaryawan() == kar.getIdKaryawan()) {
+//				listPendapatan.add(pen);
+//				
+//				if (listPendapatan.isEmpty()) {
+					if (lb.getIdKaryawan() == kar.getIdKaryawan()) {						
+						Pendapatan pendapatan = new Pendapatan (kar.getIdKaryawan(), kar , salaryDate, gajiPokok,tunjanganKeluarga,tunjanganPegawai,tunjanganTransport,gajiKotor,pphPerbulan,bpjs,gajiBersih, getLamaLembur(kar.getIdKaryawan(), date), uangLembur, getVariabelBonus(kar.getIdKaryawan(), date), uangBonus, takeHomePay);
 						
-				Pendapatan pendapatan = new Pendapatan (kar.getIdKaryawan(), kar , salaryDate, gajiPokok,tunjanganKeluarga,tunjanganPegawai,tunjanganTransport,gajiKotor,pphPerbulan,bpjs,gajiBersih, getLamaLembur(kar.getIdKaryawan(), date), uangLembur, getVariabelBonus(kar.getIdKaryawan(), date), uangBonus, takeHomePay);
-				
-				pendapatanRepository.save(pendapatan);
-				
-				PendapatanDTO pendapatanDto = convertPendapatanEntityToDTO(pendapatan);
-				
-				listPendapatanDto.add(pendapatanDto);	
-					
-				hasMap.put("Total", listPendapatanDto.size());
-				hasMap.put("Data", listPendapatanDto);
-			}		
+						pendapatanRepository.save(pendapatan);
+						
+						PendapatanDTO pendapatanDto = convertPendapatanEntityToDTO(pendapatan);
+						
+						listPendapatanDto.add(pendapatanDto);	
+						
+						
+						hasMap.put("Total", listPendapatanDto.size());
+						hasMap.put("Data", listPendapatanDto);
+					//}		
+			//	}
+			}
+			
 		}
 	}	
 return hasMap;
 }
-
 	
 	
 }
